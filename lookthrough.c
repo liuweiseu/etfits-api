@@ -168,10 +168,10 @@ int fits_to_ascii(char* filename) {
 int printAllInstancesofKeyword(char* filename,char* keyword) 
 {
     fitsfile *fptr;         /* FITS file pointer, defined in fitsio.h */
-    char card[FLEN_CARD];   /* Standard string lengths defined in fitsio.h */
+    //char card[FLEN_CARD];   /* Standard string lengths defined in fitsio.h */
     int status = 0;   /* CFITSIO status value MUST be initialized to zero! */
     int single = 0, hdupos, nkeys, ii;
-    char value;
+    char value[FLEN_VALUE];
     
     if (!fits_open_file(&fptr, filename, READONLY, &status))
     {
@@ -181,8 +181,7 @@ int printAllInstancesofKeyword(char* filename,char* keyword)
     	{
 				//printf("Header listing for HDU #%d:\n", hdupos);
 				fits_get_hdrspace(fptr, &nkeys, NULL, &status); /* <-- gets # of keywords.  Necessary for some as of yet undetermined reason. */
-
-				fits_read_keyword(fptr, keyword, &value, NULL, &status);
+				fits_read_keyword(fptr, keyword, value, NULL, &status);
 				printf("%s = %s\n", keyword, &value);	
 
 				if (status == KEY_NO_EXIST)  status = 0;      
@@ -279,11 +278,11 @@ int main(int argc, char *argv[])
 	print_list(head);*/
 	//get_hits(argv[1]);
 	//printf("testing just printing all instances of a keyword\n");
- 	//printAllInstancesofKeyword(argv[1], argv[2]);
+ 	printAllInstancesofKeyword(argv[1], argv[2]);
 	/*printf("testing printing primaryHeader\n");
 	getPrimaryHeader(argv[1]);*/
 	//getHeaderbyHDU(argv[1], atoi(argv[2]));
-	getKeywordbyHDU(argv[1], atoi(argv[2]), argv[3]);
+	//getKeywordbyHDU(argv[1], atoi(argv[2]), argv[3]);
 	//fits_to_ascii(argv[1]);	
 	return 0;
 }
