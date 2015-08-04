@@ -107,12 +107,12 @@ int fits_to_ascii(char* filename) {
     char card[FLEN_CARD]; 
     int status = 0;  // CFITSIO status value MUST be initialized to zero! 
     int single = 0, hdupos, nkeys, ii;
-    char value;
     const char* prim_header_keywords[] = {"OBSFREQ"};
     const char* header_keywords[] = {"TIME", "RA", "DEC", "BEAMPOL"};
     //const char* table_keywords[] = {"DETPOW", "MEANPOW", "COARCHID"};
     int num_prim_header_keywords = 1;	
-    int num_header_keywords = 4; 
+    int num_header_keywords = 4;
+    char value[FLEN_VALUE]; 
 		//int num_table_keywords = 3;
     /*to be included: Compute Node*/
 	
@@ -135,12 +135,9 @@ int fits_to_ascii(char* filename) {
 //				fits_get_hdrspace(fptr, &nkeys, NULL, &status); // <-- gets # of keywords.  Necessary for some reason.*/
 				for (int j = 0; j < 1; j++) 							
 				{ 
-					fits_read_keyword(fptr, header_keywords[j], &value, NULL, &status);
+					fits_read_keyword(fptr, header_keywords[j], value, NULL, &status);
 				
-					printf("%s", header_keywords[j]);
-					//printf("%s", "TIME");
-
-					printf(" = %s\n", &value);
+					printf("%s = %s\n", header_keywords[j], value);
 	
 					if (status == KEY_NO_EXIST)  status = 0;
  				}
@@ -278,12 +275,12 @@ int main(int argc, char *argv[])
 	print_list(head);*/
 	//get_hits(argv[1]);
 	//printf("testing just printing all instances of a keyword\n");
- 	printAllInstancesofKeyword(argv[1], argv[2]);
+ 	//printAllInstancesofKeyword(argv[1], argv[2]);
 	/*printf("testing printing primaryHeader\n");
 	getPrimaryHeader(argv[1]);*/
 	//getHeaderbyHDU(argv[1], atoi(argv[2]));
 	//getKeywordbyHDU(argv[1], atoi(argv[2]), argv[3]);
-	//fits_to_ascii(argv[1]);	
+	fits_to_ascii(argv[1]);	
 	return 0;
 }
 
