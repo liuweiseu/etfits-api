@@ -53,7 +53,6 @@ int get_s6data(s6dataspec_t * s6dataspec)
       //assume for now loop has been entered
       if (is_metadata(time))
       {
-        /*start of tablist.c, for figuring out bintable stuff ONLY!*/ 
         int ncols, anynul;
         long nrows; 
 
@@ -114,7 +113,7 @@ time_t get_time (fitsfile * fptr, int * status)
   time_t time;
   fits_read_key(fptr, TINT, "TIME", &time, NULL, status);
   if (*status == KEY_NO_EXIST) time = -1, *status=0;
-  return (time);
+  return ((time_t) time);
 }
 
 /*gets RA found in the binary table header block*/
