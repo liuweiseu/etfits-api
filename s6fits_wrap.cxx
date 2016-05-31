@@ -2941,17 +2941,17 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_allocator_type swig_types[0]
 #define SWIGTYPE_p_char swig_types[1]
 #define SWIGTYPE_p_difference_type swig_types[2]
-#define SWIGTYPE_p_p_PyObject swig_types[3]
-#define SWIGTYPE_p_s6dataspec_t swig_types[4]
-#define SWIGTYPE_p_s6hits_t swig_types[5]
-#define SWIGTYPE_p_size_type swig_types[6]
-#define SWIGTYPE_p_std__allocatorT_s6hits_t_t swig_types[7]
-#define SWIGTYPE_p_std__invalid_argument swig_types[8]
-#define SWIGTYPE_p_std__vectorT__Tp__Alloc_t swig_types[9]
-#define SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t swig_types[10]
-#define SWIGTYPE_p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t swig_types[11]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[12]
-#define SWIGTYPE_p_time_t swig_types[13]
+#define SWIGTYPE_p_long swig_types[3]
+#define SWIGTYPE_p_p_PyObject swig_types[4]
+#define SWIGTYPE_p_s6dataspec_t swig_types[5]
+#define SWIGTYPE_p_s6hits_t swig_types[6]
+#define SWIGTYPE_p_size_type swig_types[7]
+#define SWIGTYPE_p_std__allocatorT_s6hits_t_t swig_types[8]
+#define SWIGTYPE_p_std__invalid_argument swig_types[9]
+#define SWIGTYPE_p_std__vectorT__Tp__Alloc_t swig_types[10]
+#define SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t swig_types[11]
+#define SWIGTYPE_p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t swig_types[12]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[13]
 #define SWIGTYPE_p_value_type swig_types[14]
 static swig_type_info *swig_types[16];
 static swig_module_info swig_module = {swig_types, 15, 0, 0, 0, 0};
@@ -5734,8 +5734,8 @@ SWIGINTERN PyObject *_wrap_s6hits_t_time_set(PyObject *SWIGUNUSEDPARM(self), PyO
   time_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  long val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -5745,19 +5745,11 @@ SWIGINTERN PyObject *_wrap_s6hits_t_time_set(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_time_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_time_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "s6hits_t_time_set" "', argument " "2"" of type '" "time_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "s6hits_t_time_set" "', argument " "2"" of type '" "time_t""'");
-    } else {
-      time_t * temp = reinterpret_cast< time_t * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_long(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_time_set" "', argument " "2"" of type '" "time_t""'");
+  } 
+  arg2 = static_cast< time_t >(val2);
   if (arg1) (arg1)->time = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -5780,8 +5772,8 @@ SWIGINTERN PyObject *_wrap_s6hits_t_time_get(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_time_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  result =  ((arg1)->time);
-  resultobj = SWIG_NewPointerObj((new time_t(static_cast< const time_t& >(result))), SWIGTYPE_p_time_t, SWIG_POINTER_OWN |  0 );
+  result = (time_t) ((arg1)->time);
+  resultobj = SWIG_From_long(static_cast< long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -9010,6 +9002,7 @@ static PyMethodDef SwigMethods[] = {
 static swig_type_info _swigt__p_allocator_type = {"_p_allocator_type", "allocator_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_difference_type = {"_p_difference_type", "difference_type *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_long = {"_p_long", "long *|time_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_s6dataspec_t = {"_p_s6dataspec_t", "s6dataspec_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_s6hits_t = {"_p_s6hits_t", "std::vector< s6hits_t >::value_type *|s6hits_t *", 0, 0, (void*)0, 0};
@@ -9020,13 +9013,13 @@ static swig_type_info _swigt__p_std__vectorT__Tp__Alloc_t = {"_p_std__vectorT__T
 static swig_type_info _swigt__p_std__vectorT_int_std__allocatorT_int_t_t = {"_p_std__vectorT_int_std__allocatorT_int_t_t", "std::vector< int,std::allocator< int > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t = {"_p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t", "std::vector< s6hits_t,std::allocator< s6hits_t > > *|std::vector< s6hits_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_swig__SwigPyIterator = {"_p_swig__SwigPyIterator", "swig::SwigPyIterator *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_time_t = {"_p_time_t", "time_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_value_type = {"_p_value_type", "value_type *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_allocator_type,
   &_swigt__p_char,
   &_swigt__p_difference_type,
+  &_swigt__p_long,
   &_swigt__p_p_PyObject,
   &_swigt__p_s6dataspec_t,
   &_swigt__p_s6hits_t,
@@ -9037,13 +9030,13 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_std__vectorT_int_std__allocatorT_int_t_t,
   &_swigt__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t,
   &_swigt__p_swig__SwigPyIterator,
-  &_swigt__p_time_t,
   &_swigt__p_value_type,
 };
 
 static swig_cast_info _swigc__p_allocator_type[] = {  {&_swigt__p_allocator_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_difference_type[] = {  {&_swigt__p_difference_type, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_long[] = {  {&_swigt__p_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_PyObject[] = {  {&_swigt__p_p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_s6dataspec_t[] = {  {&_swigt__p_s6dataspec_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_s6hits_t[] = {  {&_swigt__p_s6hits_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -9054,13 +9047,13 @@ static swig_cast_info _swigc__p_std__vectorT__Tp__Alloc_t[] = {  {&_swigt__p_std
 static swig_cast_info _swigc__p_std__vectorT_int_std__allocatorT_int_t_t[] = {  {&_swigt__p_std__vectorT_int_std__allocatorT_int_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t[] = {  {&_swigt__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_swig__SwigPyIterator[] = {  {&_swigt__p_swig__SwigPyIterator, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_time_t[] = {  {&_swigt__p_time_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_value_type[] = {  {&_swigt__p_value_type, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_allocator_type,
   _swigc__p_char,
   _swigc__p_difference_type,
+  _swigc__p_long,
   _swigc__p_p_PyObject,
   _swigc__p_s6dataspec_t,
   _swigc__p_s6hits_t,
@@ -9071,7 +9064,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_std__vectorT_int_std__allocatorT_int_t_t,
   _swigc__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t,
   _swigc__p_swig__SwigPyIterator,
-  _swigc__p_time_t,
   _swigc__p_value_type,
 };
 

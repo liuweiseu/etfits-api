@@ -11,8 +11,12 @@ int main(int argc, char *argv[])
   std::vector<s6hits_t> hits;
   s6dataspec.s6hits = hits;
   s6dataspec.sortby_freq = 0;
-  s6dataspec.sortby_time = 0;
-  s6dataspec.sortby_bors = 0;
+  s6dataspec.sortby_time = 2;
+  std::vector<int> bors;
+  bors.push_back(3);
+  bors.push_back(6);
+  s6dataspec.bors = bors;
+  s6dataspec.sortby_bors = 1;
   s6dataspec.threshold = 0; 
   get_s6data(&s6dataspec);
   print_hits_table(s6dataspec.s6hits);

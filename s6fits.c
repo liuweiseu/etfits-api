@@ -3,6 +3,7 @@
 #include "fitsio.h"
 #include "s6fits.h"
 #include <vector>
+#include <algorithm>
 
 /*function declarations*/
 //int is_metadata (fitsfile * fptr, int hdupos);
@@ -19,7 +20,21 @@ int get_nhits (fitsfile * fptr, int * status);
 
 int get_missedpk (fitsfile * fptr, int * status);
 
-int is_metadata (time_t time);
+int is_metadata (fitsfile * fptr, int * status);
+
+int is_desired_bors (int bors, std::vector<int> desired_bors);
+
+int find (int val, std::vector<int> vec);
+
+void sort_bors(std::vector<s6hits_t> s6hits);
+
+void sort_time(std::vector<s6hits_t> s6hits);
+
+bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs);
+
+bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs);
+
+void sort(s6dataspec_t * s6dataspec);
 
 /*get_s6data will populate a s6hits_t data type according to the data specs
  * given by the user in the s6dataspec argument. For more details please see
@@ -30,8 +45,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
   fitsfile *fptr;
   /*status must be initialized to zero!*/
   int status = 0;
-  int single = 0, hdupos, nkeys, ii;
-  int hdunum, hdutype, ncols;
+  int hdupos = 0, nkeys;
   char * filename = s6dataspec->filename;
 
   if (!fits_open_file(&fptr, filename, READONLY, &status))
@@ -46,12 +60,13 @@ int get_s6data(s6dataspec_t * s6dataspec)
       double ra = get_RA(fptr, &status);
       int bors = get_bors(fptr, &status);
       double dec = get_dec(fptr, &status);
-      int nhits = get_nhits(fptr, &status);
       int missedpk = get_missedpk(fptr, &status); 
+      int nhits = get_nhits(fptr, &status);
       /*enter bintable loop, declare s6fits in here, adding in time, ra, bors,
       * channel, etc inside. Maybe make a function to add metadata*/
       //assume for now loop has been entered
-      if (is_metadata(time))
+      if (is_metadata(fptr, &status) && nhits > 0 
+          && is_desired_bors(bors, s6dataspec->bors))
       {
         int ncols, anynul;
         long nrows; 
@@ -103,6 +118,8 @@ int get_s6data(s6dataspec_t * s6dataspec)
   if (status) fits_report_error(stderr, status);
   
   s6dataspec->errorcode = status; 
+
+  sort(s6dataspec);
   
   return (status);
 }
@@ -143,8 +160,8 @@ double get_dec (fitsfile * fptr, int * status)
   return (dec);
 }
 
-/*gets nhits found in the binary table header block. The individual hit will
- * include the number of hits in the 'hit block' it's in. Kinda meta huh?*/
+/*gets nhits found in the binary table header block. Used for testing to see if
+ * we should look in the binary table or not.*/
 int get_nhits (fitsfile * fptr, int * status)
 {
   int nhits;
@@ -163,10 +180,69 @@ int get_missedpk (fitsfile * fptr, int * status)
   return (missedpk);
 }
 
-int is_metadata (time_t time)
+/*determine if the hdu we're looking at will include the hits or not*/
+int is_metadata (fitsfile * fptr, int * status)
 {
-  if (time != -1) return 1;
+  char extname[16];
+  fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);  
+  if (*status == KEY_NO_EXIST) *status=0;
+  if (strcmp(extname, "ETHITS") == 0) return 1;
   else return 0; 
+}
+
+int is_desired_bors (int bors, std::vector<int> desired_bors) 
+{
+  if (find(bors, desired_bors)) return 1;
+  else return 0;
+}
+
+/*might replace this with std::find since I have to include algorithm for sort
+ * anyway*/
+int find (int val, std::vector<int> vec)
+{
+  for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
+  {
+    if (val == * it) return 1;
+  }
+  return 0;
+}
+
+void sort(s6dataspec_t * s6dataspec)
+{
+  char const* sort_order[3] = {"hi", "hi", "hi"};
+  if (s6dataspec->sortby_bors > 0) {
+    sort_order[s6dataspec->sortby_bors] = "bors";
+  }
+  if (s6dataspec->sortby_time > 0) {
+    sort_order[s6dataspec->sortby_time] = "time";
+  } 
+  //if (&s6dataspec->sortby_freq > 0) sort_order[&s6dataspec->sortby_freq] = "freq";
+  for (int i=2; i >= 0; i--) 
+  {
+    if (strcmp(sort_order[i], "bors") == 0)
+      std::stable_sort(s6dataspec->s6hits.begin(), 
+                       s6dataspec->s6hits.end(), 
+                       cmpbors);
+    else if (strcmp(sort_order[i], "time") == 0) sort_time(s6dataspec->s6hits);
+    //else if (sort_order[i] == "freq") sort_freq(s6dataspec->s6hits);
+    else {;}
+  } 
+}
+
+bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs)
+{
+  return lhs.bors < rhs.bors;
+}
+
+void sort_time(std::vector<s6hits_t> s6hits)
+{
+  printf("sorting time\n");
+  std::stable_sort(s6hits.begin(), s6hits.end(), cmptime);
+}
+
+bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs)
+{
+  return lhs.time < rhs.time;
 }
 
 void print_hits_structure (std::vector<s6hits_t> s6hits) 
