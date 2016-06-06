@@ -32,7 +32,6 @@ typedef struct
   int sortby_time;
   int sortby_bors;
   float threshold;
-  //vector of subbands that you want hits extracted from. Not implemented at the
   //moment. 
   std::vector<int> bors;
   //same as above but with channels

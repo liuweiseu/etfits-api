@@ -192,6 +192,7 @@ int is_metadata (fitsfile * fptr, int * status)
 
 int is_desired_bors (int bors, std::vector<int> desired_bors) 
 {
+  if (desired_bors.empty()) return 1;
   if (find(bors, desired_bors)) return 1;
   else return 0;
 }
