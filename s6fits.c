@@ -24,6 +24,8 @@ int is_metadata (fitsfile * fptr, int * status);
 
 int is_desired_bors (int bors, std::vector<int> desired_bors);
 
+int is_desired_coarchan (int cc, std::vector<int> desired_coarchan);
+
 int find (int val, std::vector<int> vec);
 
 void sort_bors(std::vector<s6hits_t> s6hits);
@@ -62,9 +64,6 @@ int get_s6data(s6dataspec_t * s6dataspec)
       double dec = get_dec(fptr, &status);
       int missedpk = get_missedpk(fptr, &status); 
       int nhits = get_nhits(fptr, &status);
-      /*enter bintable loop, declare s6fits in here, adding in time, ra, bors,
-      * channel, etc inside. Maybe make a function to add metadata*/
-      //assume for now loop has been entered
       if (is_metadata(fptr, &status) && nhits > 0 
           && is_desired_bors(bors, s6dataspec->bors))
       {
@@ -92,18 +91,21 @@ int get_s6data(s6dataspec_t * s6dataspec)
 
         for (int i = 0; i < nhits; i++) 
         {
-          s6hits_t hit;
-          hit.time = time;
-          hit.ra = ra;
-          hit.bors = bors;
-          hit.dec = dec;
-          hit.nhits = nhits;
-          hit.missedpk = missedpk;
-          hit.detected_power = detpow_array[i];
-          hit.mean_power = meanpow_array[i];
-          hit.fine_channel_bin = finechan_array[i];
-          hit.coarse_channel_bin = coarch_array[i];
-          s6dataspec->s6hits.push_back(hit);
+          if (is_desired_coarchan(coarch_array[i], s6dataspec->channels))
+          {
+            s6hits_t hit;
+            hit.time = time;
+            hit.ra = ra;
+            hit.bors = bors;
+            hit.dec = dec;
+            hit.nhits = nhits;
+            hit.missedpk = missedpk;
+            hit.detected_power = detpow_array[i];
+            hit.mean_power = meanpow_array[i];
+            hit.fine_channel_bin = finechan_array[i];
+            hit.coarse_channel_bin = coarch_array[i];
+            s6dataspec->s6hits.push_back(hit);
+          }
         } 
       }
       
@@ -197,6 +199,13 @@ int is_desired_bors (int bors, std::vector<int> desired_bors)
   else return 0;
 }
 
+int is_desired_coarchan (int cc, std::vector<int> desired_coarchan) 
+{
+  if (desired_coarchan.empty()) return 1;
+  if (find(cc, desired_coarchan)) return 1;
+  else return 0;
+}
+
 /*might replace this with std::find since I have to include algorithm for sort
  * anyway*/
 int find (int val, std::vector<int> vec)
@@ -210,7 +219,7 @@ int find (int val, std::vector<int> vec)
 
 void sort(s6dataspec_t * s6dataspec)
 {
-  char const* sort_order[3] = {"hi", "hi", "hi"};
+  char const* sort_order[3] = {"", "", ""};
   if (s6dataspec->sortby_bors > 0) {
     sort_order[s6dataspec->sortby_bors] = "bors";
   }
@@ -244,6 +253,55 @@ void sort_time(std::vector<s6hits_t> s6hits)
 bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs)
 {
   return lhs.time < rhs.time;
+}
+
+time_t get_time_over_file (char * filename) 
+{
+  fitsfile *fptr;
+  int status = 0;
+  int hdupos = 0, nkeys;
+  time_t initial = -1;
+  time_t last;
+  if (!fits_open_file(&fptr, filename, READONLY, &status))
+  { 
+    for (; !status; hdupos++) 
+    {
+      time_t temp_time = get_time(fptr, &status);
+      if (temp_time != -1)
+      {
+        if (initial == -1) initial = temp_time; 
+        last = temp_time;
+      }
+      fits_get_hdrspace(fptr, &nkeys, NULL, &status); 
+      fits_movrel_hdu(fptr, 1, NULL, &status);
+    }
+  }
+  status = 0;
+  fits_close_file(fptr, &status); 
+  if (status) fits_report_error(stderr, status);
+  return (last - initial);
+}
+
+int get_hits_over_file (char * filename) 
+{
+  fitsfile *fptr;
+  int status = 0;
+  int hdupos = 0, nkeys;
+  int total_hits = 0;
+  if (!fits_open_file(&fptr, filename, READONLY, &status))
+  { 
+    for (; !status; hdupos++) 
+    {
+      int temp_hits = get_nhits(fptr, &status);
+      if (temp_hits != -1) total_hits += temp_hits;
+      fits_get_hdrspace(fptr, &nkeys, NULL, &status); 
+      fits_movrel_hdu(fptr, 1, NULL, &status);
+    }
+  }
+  status = 0;
+  fits_close_file(fptr, &status); 
+  if (status) fits_report_error(stderr, status);
+  return total_hits;
 }
 
 void print_hits_structure (std::vector<s6hits_t> s6hits) 

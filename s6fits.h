@@ -25,14 +25,14 @@ typedef struct
 typedef struct
 {
   char * filename;
-  //vector where hits requested will be added onto. I think. Not sure how the
-  //sorting will work here. Ask?  
+  //time over the course of one file
+  time_t seconds;
+  //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
   int sortby_freq;
   int sortby_time;
   int sortby_bors;
   float threshold;
-  //moment. 
   std::vector<int> bors;
   //same as above but with channels
   std::vector<int> channels;
@@ -40,7 +40,11 @@ typedef struct
   int errorcode;
 } s6dataspec_t;
 
-int get_s6data(s6dataspec_t * s6dataspec);
+int get_s6data (s6dataspec_t * s6dataspec);
+
+time_t get_time_over_file (char * filename);
+
+int get_hits_over_file (char * filename);
 
 void print_hits_structure (std::vector<s6hits_t> s6hits);
 
