@@ -1,0 +1,6 @@
+*.fits
+*.txt
+*.s??
+*.pyc
+swig-3.0.7
+fitsio-0.9.8
