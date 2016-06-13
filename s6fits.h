@@ -7,7 +7,8 @@
 
 typedef struct 
 {
-  time_t time;
+  double julian_date;
+  time_t unix_time;
   double ra;
   int bors;
   double dec;
@@ -39,6 +40,8 @@ typedef struct
   //status in cfitsio
   int errorcode;
 } s6dataspec_t;
+
+
 
 int get_s6data (s6dataspec_t * s6dataspec);
 
