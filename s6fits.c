@@ -7,13 +7,13 @@
 #include <algorithm>
 
 /*function declarations*/
-//int is_metadata (fitsfile * fptr, int hdupos);
+//int is_ethits (fitsfile * fptr, int hdupos);
 
 time_t get_time (fitsfile * fptr, int * status);
 
 double get_RA (fitsfile * fptr, int * status);
 
-int get_bors (fitsfile * fptr, int * status);
+int get_bors (fitsfile * fptr, char * obs, int * status);
 
 double get_dec (fitsfile * fptr, int * status);
 
@@ -25,12 +25,13 @@ int get_coarchid (fitsfile * fptr, int * status);
         
 double get_clock_freq (fitsfile * fptr, int * status);
 
-double calc_ifreq(double clock_freq, int coarchid, 
+double calc_ifreq(double clock_freq, int coarchid, char * obs,  
                   unsigned long fc, unsigned short cc);
 
-int is_aoscram(fitsfile * fptr, int * status, int * ao_flag);
+int is_aoscram_or_gbtstatus(fitsfile * fptr, int * status, 
+                            char * obs, int * flag);
 
-int is_metadata (fitsfile * fptr, int * status);
+int is_ethits (fitsfile * fptr, int * status);
 
 int is_desired_bors (int bors, std::vector<int> desired_bors);
 
@@ -60,17 +61,21 @@ int get_s6data(s6dataspec_t * s6dataspec)
   /*status must be initialized to zero!*/
   int status = 0;
   int hdupos = 0, nkeys;
-  int ao_flag = 0;
+  int flag = 0;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
-
+  //observatory, if another gets added with length > 3 make sure to change this
+  char obs[4];
   if (!fits_open_file(&fptr, filename, READONLY, &status))
   {
     //fits_get_hdu_num(fptr, &hdupos);
     
     for (; !status; hdupos++) 
     {
-      if (is_aoscram(fptr, &status, &ao_flag))
+      //checks if the header we're looking at correspond to aoscram or gbt, and
+      //if they do, get the coarchid and clock frequency once. Also sets the
+      //observatory.
+      if (is_aoscram_or_gbtstatus(fptr, &status, obs, &flag))
       {
         coarchid = get_coarchid(fptr, &status);
         clock_freq = get_clock_freq(fptr, &status);
@@ -79,11 +84,11 @@ int get_s6data(s6dataspec_t * s6dataspec)
  * grabbing it for each new hit in the binary table*/
       time_t time = get_time(fptr, &status);
       double ra = get_RA(fptr, &status);
-      int bors = get_bors(fptr, &status);
+      int bors = get_bors(fptr, obs, &status);
       double dec = get_dec(fptr, &status);
       int missedpk = get_missedpk(fptr, &status); 
       int nhits = get_nhits(fptr, &status);
-      if (is_metadata(fptr, &status) && nhits > 0 
+      if (is_ethits(fptr, &status) && nhits > 0 
           && is_desired_bors(bors, s6dataspec->bors))
       {
         int ncols, anynul;
@@ -124,7 +129,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
             hit.mean_power = meanpow_array[i];
             hit.fine_channel_bin = finechan_array[i];
             hit.coarse_channel_bin = coarch_array[i];
-            hit.ifreq = calc_ifreq(clock_freq, coarchid, 
+            hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
                                    finechan_array[i], coarch_array[i]);
             s6dataspec->s6hits.push_back(hit);
           }
@@ -167,15 +172,32 @@ double get_RA (fitsfile * fptr, int * status)
 }
 
 /*gets beampol found in the binary table header block*/
-int get_bors (fitsfile * fptr, int * status)
+int get_bors (fitsfile * fptr, char * obs, int * status)
 {
   int bors;
-  fits_read_key(fptr, TINT, "BEAMPOL", &bors, NULL, status);
-  if (*status == KEY_NO_EXIST) bors = -1, *status=0;
+  fits_read_key(fptr, TINT, "BORSPOL", &bors, NULL, status);
+  if (*status == KEY_NO_EXIST) 
+  {
+    if (strcmp(obs, "AO"))
+      fits_read_key(fptr, TINT, "BEAMPOL", &bors, NULL, status);
+    else if (strcmp(obs, "GBT"))
+    {
+      /*does this word come up???*/
+      fits_read_key(fptr, TINT, "SPECTRA", &bors, NULL, status);
+      printf("spectra\n");
+    }
+    if (*status == KEY_NO_EXIST) {
+      bors = -1, *status=0;
+      printf("not found\n");
+    }
+  }
+  else {
+    printf("borspol\n"); 
+  }
   return (bors);
 }
 
-/*gets declanation found in the binary table header block*/
+/*gets declination found in the binary table header block*/
 double get_dec (fitsfile * fptr, int * status)
 {
   double dec;
@@ -203,6 +225,8 @@ int get_missedpk (fitsfile * fptr, int * status)
   return (missedpk);
 }
 
+/*coarchid and clock_freq are found in AOSCRAM or GBTSTATUS. They are both
+ * used in calculating frequency.*/
 int get_coarchid (fitsfile * fptr, int * status) 
 {
   int coarchid;
@@ -221,12 +245,14 @@ double get_clock_freq (fitsfile * fptr, int * status)
 
 /*this should include an observatory argument at some point, but at the moment
  * this program only works with ao. Hard-coded variables apply only to ao.*/
-/*bors is just a guess as to what instance is. What's instance???*/
-double calc_ifreq(double clock_freq, int coarchid, 
+double calc_ifreq(double clock_freq, int coarchid, char * obs, 
                   unsigned long fc, unsigned short cc)
 {
+  //differing constant
+  int32_t fc_per_cc;
+  if (strcmp(obs, "GBT") == 0) fc_per_cc = pow(2.0, 19); 
+  else if (strcmp(obs, "AO") == 0) fc_per_cc = pow(2.0, 17);
   int cc_per_sys = 4096;
-  int32_t fc_per_cc = pow(2.0, 17);
   double band_width = clock_freq/2;
   double fc_bin_width = band_width/(cc_per_sys * fc_per_cc);
   double resolution = fc_bin_width * 1000000;    
@@ -237,18 +263,28 @@ double calc_ifreq(double clock_freq, int coarchid,
   return ifreq;
 }
 
-int is_aoscram (fitsfile * fptr, int * status, int * ao_flag)
+int is_aoscram_or_gbtstatus (fitsfile * fptr, int * status, 
+                             char * obs, int * flag)
 {
-  if (*ao_flag == 1) return 0;
+  if (*flag == 1) return 0;
   char extname[16];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
   if (*status == KEY_NO_EXIST) *status=0;
-  if (strcmp(extname, "AOSCRAM") == 0) *ao_flag = 1;
-  return (*ao_flag);
+  if (strcmp(extname, "AOSCRAM") == 0)
+  {
+    *flag = 1;
+    strcpy(obs, "AO");
+  } 
+  if (strcmp(extname, "GBTSTATUS") == 0)
+  {
+    *flag = 1;
+    strcpy(obs, "GBT");
+  }
+  return (*flag);
 }
 
 /*determine if the hdu we're looking at will include the hits or not*/
-int is_metadata (fitsfile * fptr, int * status)
+int is_ethits (fitsfile * fptr, int * status)
 {
   char extname[16];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);  
