@@ -1,6 +1,0 @@
-To compile C code: 
-make
-To compile Python wrapper
-swig -python -c++ -extranative s6fits.i
-make _s6fits.so
-
