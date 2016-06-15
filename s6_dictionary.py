@@ -148,9 +148,9 @@ def main():
   """ 
   dataspec = s6fits.s6dataspec_t()
   dataspec.filename = sys.argv[1]
-  #dataspec.bors.push_back(3)
-  #dataspec.bors.push_back(6)  
-  #dataspec.sortby_bors = 1
+  dataspec.bors.push_back(3)
+  dataspec.bors.push_back(6)  
+  dataspec.sortby_bors = 1
   """
   get_s6data() will either create a new s6fits vector, or if your dataspec
   includes a vector, it will add hits to it. Right now we have no vector of hits
