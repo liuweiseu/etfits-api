@@ -30,9 +30,11 @@ typedef struct
   time_t seconds;
   //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
+  //std::vector<s6hitsheader_t> s6hitsheader;
   int sortby_freq;
   int sortby_time;
   int sortby_bors;
+  //int header_only;
   float threshold;
   std::vector<int> bors;
   //same as above but with channels

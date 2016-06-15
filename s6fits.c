@@ -252,7 +252,11 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   double fc_bin_width = band_width/(cc_per_sys * fc_per_cc);
   double resolution = fc_bin_width * 1000000;    
   double sys_cc = coarchid + cc;
-  long signed_fc = (fc & 0x0001FFFF) | ((fc & 0x00010000) ? 0xFFFE0000 : 0);	
+  long signed_fc;
+  if (strcmp(obs, "AO") == 0)
+    signed_fc = (fc & 0x0001FFFF) | ((fc & 0x00010000) ? 0xFFFE0000 : 0);	
+  if (strcmp(obs, "GBT") == 0)
+    signed_fc = (fc & 0x0007FFFF) | ((fc & 0x00040000) ? 0xFFF80000 : 0);	
   double sys_fc = fc_per_cc * sys_cc + signed_fc;
   double ifreq = ((sys_fc + fc_per_cc) * resolution) / 1000000;   
   return ifreq;
