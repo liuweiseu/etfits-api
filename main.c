@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   s6dataspec.sortby_bors = 0;
   s6dataspec.threshold = 20.0; 
   get_s6data(&s6dataspec);
-  //print_hits_table(s6dataspec.s6hits);
+  print_hits_table(s6dataspec.s6hits);
   //if (argc == 3) get_num_hits(s6dataspec.s6hits);
   //time_t time = get_time_over_file (filename);
   //int num_hits = get_hits_over_file (filename);

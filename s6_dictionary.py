@@ -49,7 +49,7 @@ typedef struct
   int errorcode;
 } s6dataspec_t;
 
-Upcoming API features:
+Upcoming Python specific API features:
 -throwing an error when a user goes out of bounds on the s6Vec class. At the
 moment, users are able to continue past the end of the vector until the program
 segfaults. There won't be any segfaults should it be used as a proper iterable,
@@ -107,7 +107,7 @@ def remove_single_hit(s6hits, index):
   """removes a hit at a specific index."""
 
   # .begin() returns an iterator beginning at the first element.
-  # note if you want to delete the first element, you still a + 0
+  # note if you want to delete the first element, you still need to add 0
   head = s6hits.begin()
   s6hits.erase(head + index)
    
@@ -135,8 +135,6 @@ def combine_vectors(hitlist1, hitlist2):
 two vectors together using one as the return vector for now."""
   vec = s6fits.s6Vector()
   vec.insert(hitlist1.begin(), s6Vector)
-  #vec.insert(vec.end(), hitlist1.begin(), hitlist1.end())
-  #vec.insert(vec.end(), hitlist2.begin(), histlist2.end())
   return vec
 
 def main():
@@ -146,24 +144,27 @@ def main():
   """
   initialize your dataspec_t object. For now you must initialize it with no
   arguments and fill them in subsequent lines. If you only specify filename, the
-  program will assume you want all the hits in the file you provide, which is
-  great because that's all it can do right now.
+  program will assume you want all the hits in the file you provide.
   """ 
   dataspec = s6fits.s6dataspec_t()
   dataspec.filename = sys.argv[1]
-    
+  #dataspec.bors.push_back(3)
+  #dataspec.bors.push_back(6)  
+  #dataspec.sortby_bors = 1
   """
   get_s6data() will either create a new s6fits vector, or if your dataspec
   includes a vector, it will add hits to it. Right now we have no vector of hits
   we want to add to so we'll just leave it empty.
   """  
   s6fits.get_s6data(dataspec)
+  s6fits.print_hits_table(dataspec.s6hits)
   #make_hits_list(dataspec.s6hits)
+"""
   remove_single_hit(dataspec.s6hits, 10)   
   remove_range_of_hits(dataspec.s6hits, range(0,5))
   index_range = range(0, 100) 
   v = get_range_of_hits(dataspec.s6hits, index_range)
-  """dataspec2 = s6fits.s6dataspec_t() 
+  dataspec2 = s6fits.s6dataspec_t() 
   dataspec2.filename = sys.argv[2]
   s6fits.get_s6data(dataspec2)
   u = s6fits.s6Vector()

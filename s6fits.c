@@ -7,8 +7,6 @@
 #include <algorithm>
 
 /*function declarations*/
-//int is_ethits (fitsfile * fptr, int hdupos);
-
 time_t get_time (fitsfile * fptr, int * status);
 
 double get_RA (fitsfile * fptr, int * status);
@@ -64,7 +62,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
   int flag = 0;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
-  //observatory, if another gets added with length > 3 make sure to change this
+  /*observatory, if another gets added with length > 3 change this*/
   char obs[4];
   if (!fits_open_file(&fptr, filename, READONLY, &status))
   {
@@ -178,21 +176,17 @@ int get_bors (fitsfile * fptr, char * obs, int * status)
   fits_read_key(fptr, TINT, "BORSPOL", &bors, NULL, status);
   if (*status == KEY_NO_EXIST) 
   {
-    if (strcmp(obs, "AO"))
+    *status = 0;
+    if (strcmp(obs, "AO") == 0)
+    {
       fits_read_key(fptr, TINT, "BEAMPOL", &bors, NULL, status);
-    else if (strcmp(obs, "GBT"))
+    }
+    else if (strcmp(obs, "GBT") == 0)
     {
       /*does this word come up???*/
       fits_read_key(fptr, TINT, "SPECTRA", &bors, NULL, status);
-      printf("spectra\n");
     }
-    if (*status == KEY_NO_EXIST) {
-      bors = -1, *status=0;
-      printf("not found\n");
-    }
-  }
-  else {
-    printf("borspol\n"); 
+    if (*status == KEY_NO_EXIST) bors = -1, *status=0;
   }
   return (bors);
 }
@@ -243,8 +237,9 @@ double get_clock_freq (fitsfile * fptr, int * status)
   return (clock_freq);
 }
 
-/*this should include an observatory argument at some point, but at the moment
- * this program only works with ao. Hard-coded variables apply only to ao.*/
+/*now works with both ao and gbt. Some finechannel per coarsechannel is
+ * hardcoded in depending on which observatory is used. Should another
+ * observatory be added, this function will need to be updated*/
 double calc_ifreq(double clock_freq, int coarchid, char * obs, 
                   unsigned long fc, unsigned short cc)
 {
@@ -263,6 +258,8 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   return ifreq;
 }
 
+/*this returns an affirmative for if we're in the correct header to grab the
+ * coarchid and clock freq. This function will also grab the observatory name*/
 int is_aoscram_or_gbtstatus (fitsfile * fptr, int * status, 
                              char * obs, int * flag)
 {
@@ -293,12 +290,15 @@ int is_ethits (fitsfile * fptr, int * status)
   else return 0; 
 }
 
-//convert from unix time to julian date
+/*convert from unix time to julian date*/
 float get_julian_from_unix (int unix_time)
 {
   return (unix_time / 86400.0) + 2440587.5;
 }
 
+/*determines if we want to grab hits depending on the beampol/spectra provided
+ * by the user. If no specifications are given (empty bors vector), then we'll
+ * return 1 for everything*/
 int is_desired_bors (int bors, std::vector<int> desired_bors) 
 {
   if (desired_bors.empty()) return 1;
@@ -306,6 +306,7 @@ int is_desired_bors (int bors, std::vector<int> desired_bors)
   else return 0;
 }
 
+/*same thing as above but for coarse channels*/
 int is_desired_coarchan (int cc, std::vector<int> desired_coarchan) 
 {
   if (desired_coarchan.empty()) return 1;
@@ -353,7 +354,6 @@ bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs)
 
 void sort_time(std::vector<s6hits_t> s6hits)
 {
-  printf("sorting time\n");
   std::stable_sort(s6hits.begin(), s6hits.end(), cmptime);
 }
 

@@ -12,5 +12,6 @@
 %include "s6fits.h"
 
 %template(s6Vector) std::vector<s6hits_t>;
+%template(IntVector) std::vector<int>;
 
 
