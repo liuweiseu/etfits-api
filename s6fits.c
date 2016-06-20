@@ -32,11 +32,20 @@ double get_if1synhz (fitsfile * fptr, int * status);
 
 double get_if2synhz (fitsfile * fptr, int * status);
 
+double get_ifv1csfq (fitsfile * fptr, int * status);
+
+double get_ifv1iffq (fitsfile * fptr, int * status);
+
+void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb);
+
 double calc_ifreq(double clock_freq, int coarchid, char * obs,  
                   int32_t signed_fc, unsigned short cc);
 
-double calc_rfreq(char * telescope, double if1synhz, 
+double calc_ao_rfreq(char * telescope, double if1synhz, 
                   double if2synhz, double ifreq);
+
+double calc_gbt_rfreq(double ifreq, double ifv1csfq, 
+                      double ifv1iffq, char * ifv1ssb);
 
 int is_aoscram(fitsfile * fptr, int * status, 
                char * obs, int * obs_flag);
@@ -82,6 +91,8 @@ int get_s6data(s6dataspec_t * s6dataspec)
   char telescope[FLEN_VALUE];
   char obs[10];
   double if2synhz, if1synhz;
+  double ifv1iffq, ifv1csfq;
+  char ifv1ssb[FLEN_VALUE];
   if (!fits_open_file(&fptr, filename, READONLY, &status))
   {
     //fits_get_hdu_num(fptr, &hdupos); 
@@ -104,12 +115,20 @@ int get_s6data(s6dataspec_t * s6dataspec)
           clock_freq = get_clock_freq(fptr, &status);
           flag = 1;
         }
-        if (strcmp(telescope, "AO_327MHz") == 0)
+        if (strcmp(obs, "AO") == 0) 
         {
-          if2synhz = get_if2synhz(fptr, &status);
-          printf("AO_327MHz");
+          if (strcmp(telescope, "AO_327MHz") == 0)
+          {
+            if2synhz = get_if2synhz(fptr, &status);
+          }
+          if1synhz = get_if1synhz(fptr, &status); 
         }
-        if1synhz = get_if1synhz(fptr, &status); 
+        else if (strcmp(obs, "GBT") == 0) 
+        {
+          get_ifv1ssb(fptr, &status, ifv1ssb);
+          ifv1iffq = get_ifv1iffq(fptr, &status);
+          ifv1csfq = get_ifv1csfq(fptr, &status); 
+        }
       }
       /* calculated and saved before we make the hit to save us the hassle of
  * grabbing it for each new hit in the binary table*/
@@ -164,6 +183,13 @@ int get_s6data(s6dataspec_t * s6dataspec)
             hit.coarse_channel_bin = coarch_array[i];
             hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
                                    signed_fc, coarch_array[i]);
+            if (strcmp(obs, "AO") == 0) 
+              hit.rfreq = calc_ao_rfreq(telescope, if1synhz, 
+                                        if2synhz, hit.ifreq);
+            else if (strcmp(obs, "GBT") == 0) 
+              hit.rfreq = calc_gbt_rfreq(hit.ifreq, ifv1csfq, 
+                                         ifv1iffq, ifv1ssb);
+            else hit.rfreq = -1;
             s6dataspec->s6hits.push_back(hit);
           }
         } 
@@ -192,6 +218,7 @@ void get_telescope (fitsfile * fptr, int * status, char * telescope)
   fits_read_key(fptr, TSTRING, "TELESCOP", telescope, NULL, status);
   //telescope is in the primary header, this should only run once. If there's an
   //error, something is very wrong.
+  printf("%s\n", telescope);
   if (*status) fits_report_error(stderr, *status);
 }
 
@@ -309,6 +336,29 @@ int32_t get_signed_fc (int32_t fc, char * obs)
   return signed_fc;
 }
 
+double get_ifv1csfq (fitsfile * fptr, int * status)
+{
+  double ifv1csfq;
+  fits_read_key(fptr, TDOUBLE, "IFV1CSFQ", &ifv1csfq, NULL, status);
+  if (*status == KEY_NO_EXIST) ifv1csfq = -1, *status=0;
+  return (ifv1csfq);
+}
+
+double get_ifv1iffq (fitsfile * fptr, int * status)
+{
+  double ifv1iffq;
+  fits_read_key(fptr, TDOUBLE, "IFV1IFFQ", &ifv1iffq, NULL, status);
+  if (*status == KEY_NO_EXIST) ifv1iffq = -1, *status=0;
+  return (ifv1iffq);
+}
+
+void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb)
+{
+  fits_read_key(fptr, TSTRING, "IFV1SSB", ifv1ssb, NULL, status);
+  if (*status) fits_report_error(stderr, *status);
+}
+
+
 /*now works with both ao and gbt. Some finechannel per coarsechannel is
  * hardcoded in depending on which observatory is used. Should another
  * observatory be added, this function will need to be updated*/
@@ -329,8 +379,8 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   return ifreq;
 }
 
-/*calculates sky frequency, only works for AO*/
-double calc_rfreq(char * telescope, double if1synhz, 
+/*calculates sky frequency for AO*/
+double calc_ao_rfreq(char * telescope, double if1synhz, 
                   double if2synhz, double ifreq)
 {
   double rf;
@@ -339,6 +389,19 @@ double calc_rfreq(char * telescope, double if1synhz,
   else if (strcmp(telescope, "AO_327MHz") == 0)
     rf = (if1synhz / 1000000) - ((if2synhz / 1000000) - ifreq);
   else rf = -1;
+  return rf;
+}
+
+double calc_gbt_rfreq(double ifreq, double ifv1csfq, 
+                      double ifv1iffq, char * ifv1ssb) 
+{
+  double rf;
+  if (strcmp(ifv1ssb, "upper") == 0)
+    rf = ifv1csfq + (ifreq - ifv1iffq);
+  else if (strcmp(ifv1ssb, "lower") == 0)
+    rf = ifv1csfq - (ifreq - ifv1iffq); 
+  else 
+    rf = -1;
   return rf;
 }
 
@@ -526,9 +589,7 @@ void print_hits_structure (std::vector<s6hits_t> s6hits)
       printf("coarse channel bin: %hu\n", hit->coarse_channel_bin);
       /*calculated frequencies*/ 
       printf("ifreq: %g\n", hit->ifreq);
-      /*
       printf("rfreq: %g\n", hit->rfreq); 
-      */
       printf("\n");
     }
 }
@@ -536,30 +597,32 @@ void print_hits_structure (std::vector<s6hits_t> s6hits)
 void print_hits_table (std::vector<s6hits_t> s6hits)
 {
   printf("%15s", "Unix Time");
-  printf("%25s", "Julian Date");
+  printf("%20s", "Julian Date");
   printf("%10s", "RA");
   printf("%10s", "BorS");
   printf("%15s", "DEC");
   printf("%10s", "MSDPK");
-  printf("%25s", "DETPOW");
+  printf("%20s", "DETPOW");
   printf("%20s", "MEANPOW");
-  printf("%20s", "FINECHAN");
-  printf("%15s", "COARCHID"); 
-  printf("%15s\n", "ifreq");
+  printf("%13s", "FINECHAN");
+  printf("%10s", "COARCHAN"); 
+  printf("%15s", "ifreq");
+  printf("%15s\n", "rfreq");
   for (std::vector<s6hits_t>::iterator hit = s6hits.begin() ; 
          hit != s6hits.end(); ++hit)
   {
     printf("%15d", (int) hit->unix_time);
-    printf("%25f", hit->julian_date);
+    printf("%20f", hit->julian_date);
     printf("%10g", hit->ra);
     printf("%10d", hit->bors);
     printf("%15g", hit->dec);
     printf("%10d", hit->missedpk);
-    printf("%25f", hit->detected_power);
+    printf("%20f", hit->detected_power);
     printf("%20f", hit->mean_power);
-    printf("%20d", (int)  hit->fine_channel_bin);
-    printf("%15hu", hit->coarse_channel_bin);
-    printf("%15f\n", hit->ifreq); 
+    printf("%13d", (int)  hit->fine_channel_bin);
+    printf("%10hu", hit->coarse_channel_bin);
+    printf("%15f", hit->ifreq); 
+    printf("%15f\n", hit->rfreq); 
   }
 }
 
