@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "fitsio.h"
 #include "s6fits.h"
 #include <math.h>
@@ -7,6 +8,8 @@
 #include <algorithm>
 
 /*function declarations*/
+void get_telescope (fitsfile * fptr, int * status, char * telescope);
+
 time_t get_time (fitsfile * fptr, int * status);
 
 double get_RA (fitsfile * fptr, int * status);
@@ -23,11 +26,23 @@ int get_coarchid (fitsfile * fptr, int * status);
         
 double get_clock_freq (fitsfile * fptr, int * status);
 
-double calc_ifreq(double clock_freq, int coarchid, char * obs,  
-                  unsigned long fc, unsigned short cc);
+int32_t get_signed_fc (int32_t fc, char * obs);
 
-int is_aoscram_or_gbtstatus(fitsfile * fptr, int * status, 
-                            char * obs, int * flag);
+double get_if1synhz (fitsfile * fptr, int * status);
+
+double get_if2synhz (fitsfile * fptr, int * status);
+
+double calc_ifreq(double clock_freq, int coarchid, char * obs,  
+                  int32_t signed_fc, unsigned short cc);
+
+double calc_rfreq(char * telescope, double if1synhz, 
+                  double if2synhz, double ifreq);
+
+int is_aoscram(fitsfile * fptr, int * status, 
+               char * obs, int * obs_flag);
+
+int is_gbtstatus(fitsfile * fptr, int * status, 
+                 char * obs, int * obs_flag);
 
 int is_ethits (fitsfile * fptr, int * status);
 
@@ -35,7 +50,7 @@ int is_desired_bors (int bors, std::vector<int> desired_bors);
 
 int is_desired_coarchan (int cc, std::vector<int> desired_coarchan);
 
-float get_julian_from_unix (int unix_time);
+double get_julian_from_unix (int unix_time);
 
 int find (int val, std::vector<int> vec);
 
@@ -60,23 +75,41 @@ int get_s6data(s6dataspec_t * s6dataspec)
   int status = 0;
   int hdupos = 0, nkeys;
   int flag = 0;
+  int obs_flag = 0;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
   /*observatory, if another gets added with length > 3 change this*/
-  char obs[4];
+  char telescope[FLEN_VALUE];
+  char obs[10];
+  double if2synhz, if1synhz;
   if (!fits_open_file(&fptr, filename, READONLY, &status))
   {
-    //fits_get_hdu_num(fptr, &hdupos);
-    
+    //fits_get_hdu_num(fptr, &hdupos); 
     for (; !status; hdupos++) 
     {
+      //primary header
+      if (hdupos == 0)
+      {
+        get_telescope(fptr, &status, telescope);
+      }
       //checks if the header we're looking at correspond to aoscram or gbt, and
       //if they do, get the coarchid and clock frequency once. Also sets the
       //observatory.
-      if (is_aoscram_or_gbtstatus(fptr, &status, obs, &flag))
+      if (is_aoscram(fptr, &status, obs, &obs_flag) || 
+          is_gbtstatus(fptr, &status, obs, &obs_flag))
       {
-        coarchid = get_coarchid(fptr, &status);
-        clock_freq = get_clock_freq(fptr, &status);
+        if (!flag) 
+        {
+          coarchid = get_coarchid(fptr, &status);
+          clock_freq = get_clock_freq(fptr, &status);
+          flag = 1;
+        }
+        if (strcmp(telescope, "AO_327MHz") == 0)
+        {
+          if2synhz = get_if2synhz(fptr, &status);
+          printf("AO_327MHz");
+        }
+        if1synhz = get_if1synhz(fptr, &status); 
       }
       /* calculated and saved before we make the hit to save us the hassle of
  * grabbing it for each new hit in the binary table*/
@@ -125,10 +158,12 @@ int get_s6data(s6dataspec_t * s6dataspec)
             hit.missedpk = missedpk;
             hit.detected_power = detpow_array[i];
             hit.mean_power = meanpow_array[i];
-            hit.fine_channel_bin = finechan_array[i];
+            int32_t signed_fc = get_signed_fc(finechan_array[i], obs);
+            hit.fine_channel_bin = signed_fc;
+            //hit.fine_channel_bin = finechan_array[i];
             hit.coarse_channel_bin = coarch_array[i];
             hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
-                                   finechan_array[i], coarch_array[i]);
+                                   signed_fc, coarch_array[i]);
             s6dataspec->s6hits.push_back(hit);
           }
         } 
@@ -149,6 +184,15 @@ int get_s6data(s6dataspec_t * s6dataspec)
   sort(s6dataspec);
   
   return (status);
+}
+
+/*gets telescope found in primary header*/
+void get_telescope (fitsfile * fptr, int * status, char * telescope)
+{
+  fits_read_key(fptr, TSTRING, "TELESCOP", telescope, NULL, status);
+  //telescope is in the primary header, this should only run once. If there's an
+  //error, something is very wrong.
+  if (*status) fits_report_error(stderr, *status);
 }
 
 /*gets time found in the binary table header block*/
@@ -201,7 +245,7 @@ double get_dec (fitsfile * fptr, int * status)
 }
 
 /*gets nhits found in the binary table header block. Used for testing to see if
- * we should look in the binary table or not.*/
+ * we should look in the binary table or not and finding total hits in a file*/
 int get_nhits (fitsfile * fptr, int * status)
 {
   int nhits;
@@ -220,7 +264,7 @@ int get_missedpk (fitsfile * fptr, int * status)
 }
 
 /*coarchid and clock_freq are found in AOSCRAM or GBTSTATUS. They are both
- * used in calculating frequency.*/
+ * used in calculating intermediate frequency.*/
 int get_coarchid (fitsfile * fptr, int * status) 
 {
   int coarchid;
@@ -237,11 +281,39 @@ double get_clock_freq (fitsfile * fptr, int * status)
   return (clock_freq);
 }
 
+/*if1synhz and if2synhz are used to calculate sky frequency*/
+double get_if1synhz (fitsfile * fptr, int * status)
+{
+  double if1synhz;
+  fits_read_key(fptr, TDOUBLE, "IF1SYNHZ", &if1synhz, NULL, status);
+  if (*status == KEY_NO_EXIST) if1synhz = -1, *status=0;
+  return (if1synhz);
+}
+
+double get_if2synhz (fitsfile * fptr, int * status)
+{
+  double if2synhz;
+  fits_read_key(fptr, TDOUBLE, "IF2SYNHZ", &if2synhz, NULL, status);
+  if (*status == KEY_NO_EXIST) if2synhz = -1, *status=0;
+  return (if2synhz);
+}
+
+int32_t get_signed_fc (int32_t fc, char * obs) 
+{
+  int32_t signed_fc;
+  if (strcmp(obs, "AO") == 0)
+    signed_fc = (fc & 0x0001FFFF) | ((fc & 0x00010000) ? 0xFFFE0000 : 0);	
+  else if (strcmp(obs, "GBT") == 0)
+    signed_fc = (fc & 0x0007FFFF) | ((fc & 0x00040000) ? 0xFFF80000 : 0);	
+  else signed_fc = -1;
+  return signed_fc;
+}
+
 /*now works with both ao and gbt. Some finechannel per coarsechannel is
  * hardcoded in depending on which observatory is used. Should another
  * observatory be added, this function will need to be updated*/
 double calc_ifreq(double clock_freq, int coarchid, char * obs, 
-                  unsigned long fc, unsigned short cc)
+                  int32_t signed_fc, unsigned short cc)
 {
   //differing constant
   int32_t fc_per_cc;
@@ -252,36 +324,56 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   double fc_bin_width = band_width/(cc_per_sys * fc_per_cc);
   double resolution = fc_bin_width * 1000000;    
   double sys_cc = coarchid + cc;
-  long signed_fc;
-  if (strcmp(obs, "AO") == 0)
-    signed_fc = (fc & 0x0001FFFF) | ((fc & 0x00010000) ? 0xFFFE0000 : 0);	
-  if (strcmp(obs, "GBT") == 0)
-    signed_fc = (fc & 0x0007FFFF) | ((fc & 0x00040000) ? 0xFFF80000 : 0);	
   double sys_fc = fc_per_cc * sys_cc + signed_fc;
   double ifreq = ((sys_fc + fc_per_cc) * resolution) / 1000000;   
   return ifreq;
 }
 
-/*this returns an affirmative for if we're in the correct header to grab the
- * coarchid and clock freq. This function will also grab the observatory name*/
-int is_aoscram_or_gbtstatus (fitsfile * fptr, int * status, 
-                             char * obs, int * flag)
+/*calculates sky frequency, only works for AO*/
+double calc_rfreq(char * telescope, double if1synhz, 
+                  double if2synhz, double ifreq)
 {
-  if (*flag == 1) return 0;
-  char extname[16];
+  double rf;
+  if (strcmp(telescope, "AO_ALFA") == 0)
+    rf = (if1synhz / 1000000) - ifreq;
+  else if (strcmp(telescope, "AO_327MHz") == 0)
+    rf = (if1synhz / 1000000) - ((if2synhz / 1000000) - ifreq);
+  else rf = -1;
+  return rf;
+}
+
+int is_aoscram (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+{
+  char extname[FLEN_VALUE];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
-  if (*status == KEY_NO_EXIST) *status=0;
   if (strcmp(extname, "AOSCRAM") == 0)
   {
-    *flag = 1;
-    strcpy(obs, "AO");
-  } 
+    if (!*obs_flag) 
+    {
+      strcpy(obs, "AO");
+      *obs_flag = 1;
+    }
+    return 1;
+  }
+  if (*status == KEY_NO_EXIST) *status=0;
+  return 0;
+}
+
+int is_gbtstatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+{
+  char extname[FLEN_VALUE];
+  fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
   if (strcmp(extname, "GBTSTATUS") == 0)
   {
-    *flag = 1;
-    strcpy(obs, "GBT");
+    if (!*obs_flag) 
+    {
+      strcpy(obs, "GBT");
+      *obs_flag = 1;
+    }
+    return 1;
   }
-  return (*flag);
+  if (*status == KEY_NO_EXIST) *status=0;
+  return 0; 
 }
 
 /*determine if the hdu we're looking at will include the hits or not*/
@@ -295,9 +387,9 @@ int is_ethits (fitsfile * fptr, int * status)
 }
 
 /*convert from unix time to julian date*/
-float get_julian_from_unix (int unix_time)
+double get_julian_from_unix (int unix_time)
 {
-  return (unix_time / 86400.0) + 2440587.5;
+  return (double(unix_time) / 86400.0) + 2440587.5;
 }
 
 /*determines if we want to grab hits depending on the beampol/spectra provided
@@ -430,7 +522,7 @@ void print_hits_structure (std::vector<s6hits_t> s6hits)
       /*binary table data*/
       printf("detected power: %f\n", hit->detected_power);
       printf("mean power: %f\n", hit->mean_power);
-      printf("fine channel bin: %lu\n", hit->fine_channel_bin);
+      printf("fine channel bin: %zu\n", (size_t) hit->fine_channel_bin);
       printf("coarse channel bin: %hu\n", hit->coarse_channel_bin);
       /*calculated frequencies*/ 
       printf("ifreq: %g\n", hit->ifreq);
@@ -451,7 +543,7 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
   printf("%10s", "MSDPK");
   printf("%25s", "DETPOW");
   printf("%20s", "MEANPOW");
-  printf("%15s", "FINECHAN");
+  printf("%20s", "FINECHAN");
   printf("%15s", "COARCHID"); 
   printf("%15s\n", "ifreq");
   for (std::vector<s6hits_t>::iterator hit = s6hits.begin() ; 
@@ -465,9 +557,9 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%10d", hit->missedpk);
     printf("%25f", hit->detected_power);
     printf("%20f", hit->mean_power);
-    printf("%15lu", hit->fine_channel_bin);
+    printf("%20d", (int)  hit->fine_channel_bin);
     printf("%15hu", hit->coarse_channel_bin);
-    printf("%15g\n", hit->ifreq); 
+    printf("%15f\n", hit->ifreq); 
   }
 }
 

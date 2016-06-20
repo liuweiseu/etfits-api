@@ -2,6 +2,7 @@
 *.txt
 *.s??
 *.pyc
+.nfs*
 swig-3.0.7
 fitsio-0.9.8
 pyfits-3.3

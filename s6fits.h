@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <vector>
+#include <stdint.h>
 
 typedef struct 
 {
@@ -16,7 +17,7 @@ typedef struct
   int missedpk;
   float detected_power;
   float mean_power;
-  unsigned long fine_channel_bin;
+  int32_t fine_channel_bin;
   unsigned short coarse_channel_bin;
   //to be calculated by a seperate function. Not implemented at the moment.
   double ifreq;
@@ -30,6 +31,7 @@ typedef struct
   time_t seconds;
   //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
+  //make new function for this?
   //std::vector<s6hitsheader_t> s6hitsheader;
   int sortby_freq;
   int sortby_time;
@@ -46,6 +48,8 @@ typedef struct
 
 
 int get_s6data (s6dataspec_t * s6dataspec);
+
+//int get_s6hitsheaders (s6dataspec_t * s6dataspec);
 
 time_t get_time_over_file (char * filename);
 
