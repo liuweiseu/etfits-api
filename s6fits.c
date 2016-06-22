@@ -212,6 +212,54 @@ int get_s6data(s6dataspec_t * s6dataspec)
   return (status);
 }
 
+int get_s6hitsheaders(s6dataspec_t * s6dataspec) 
+{
+  fitsfile *fptr;
+  /*status must be initialized to zero!*/
+  int status = 0;
+  int hdupos = 0, nkeys;
+  char * filename = s6dataspec->filename;
+  int obs_flag = 0;
+  char obs[10];
+  if (!fits_open_file(&fptr, filename, READONLY, &status))
+  {
+    for (; !status; hdupos++) 
+    {
+      /* these below functions are necessary just to grab the observatory for
+       * bors */
+      is_aoscram(fptr, &status, obs, &obs_flag);
+      is_gbtstatus(fptr, &status, obs, &obs_flag);
+      int bors = get_bors(fptr, obs, &status);
+      if (is_ethits(fptr, &status) && is_desired_bors(bors, s6dataspec->bors))
+      {
+        s6hitsheader_t header;
+        header.unix_time = get_time(fptr, &status);
+        header.julian_date = get_julian_from_unix((int) header.unix_time);
+        header.ra = get_RA(fptr, &status);
+        header.bors = bors;
+        header.dec = get_dec(fptr, &status);
+        header.missedpk = get_missedpk(fptr, &status); 
+        header.nhits = get_nhits(fptr, &status);
+        
+        s6dataspec->s6hitsheaders.push_back(header);
+      }
+      /* moves to next hdu */
+      fits_get_hdrspace(fptr, &nkeys, NULL, &status); 
+      fits_movrel_hdu(fptr, 1, NULL, &status);
+    }  
+  }    
+  status = 0;
+  fits_close_file(fptr, &status);
+ 
+  if (status) fits_report_error(stderr, status);
+  
+  s6dataspec->errorcode = status; 
+
+  sort(s6dataspec);
+  
+  return (status);
+}
+
 /*gets telescope found in primary header*/
 void get_telescope (fitsfile * fptr, int * status, char * telescope)
 {
@@ -623,6 +671,28 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%10hu", hit->coarse_channel_bin);
     printf("%15f", hit->ifreq); 
     printf("%15f\n", hit->rfreq); 
+  }
+}
+
+void print_hits_header_table (std::vector<s6hitsheader_t> s6hitsheaders)
+{
+  printf("%15s", "Unix Time");
+  printf("%20s", "Julian Date");
+  printf("%10s", "RA");
+  printf("%10s", "BorS");
+  printf("%10s", "NHITS");
+  printf("%15s", "DEC");
+  printf("%10s\n", "MSDPK");
+  for (std::vector<s6hitsheader_t>::iterator header = s6hitsheaders.begin() ; 
+         header != s6hitsheaders.end(); ++header)
+  {
+    printf("%15d", (int) header->unix_time);
+    printf("%20f", header->julian_date);
+    printf("%10g", header->ra);
+    printf("%10d", header->bors);
+    printf("%10d", header->nhits);
+    printf("%15g", header->dec);
+    printf("%10d\n", header->missedpk);
   }
 }
 

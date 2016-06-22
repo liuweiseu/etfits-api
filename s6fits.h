@@ -26,13 +26,24 @@ typedef struct
 
 typedef struct
 {
+  double julian_date;
+  time_t unix_time;
+  double ra;
+  int bors;
+  double dec;
+  int nhits;
+  int missedpk;  
+} s6hitsheader_t;
+
+typedef struct
+{
   char * filename;
   //time over the course of one file
   time_t seconds;
   //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
   //make new function for this?
-  //std::vector<s6hitsheader_t> s6hitsheader;
+  std::vector<s6hitsheader_t> s6hitsheaders;
   int sortby_freq;
   int sortby_time;
   int sortby_bors;
@@ -49,7 +60,7 @@ typedef struct
 
 int get_s6data (s6dataspec_t * s6dataspec);
 
-//int get_s6hitsheaders (s6dataspec_t * s6dataspec);
+int get_s6hitsheaders (s6dataspec_t * s6dataspec);
 
 time_t get_time_over_file (char * filename);
 
@@ -58,5 +69,7 @@ int get_hits_over_file (char * filename);
 void print_hits_structure (std::vector<s6hits_t> s6hits);
 
 void print_hits_table (std::vector<s6hits_t> s6hits);
+
+void print_hits_header_table (std::vector<s6hitsheader_t> s6hitsheaders);
 
 #endif
