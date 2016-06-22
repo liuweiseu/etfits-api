@@ -13,13 +13,11 @@ typedef struct
   double ra;
   int bors;
   double dec;
-  int nhits;
   int missedpk;
   float detected_power;
   float mean_power;
   int32_t fine_channel_bin;
   unsigned short coarse_channel_bin;
-  //to be calculated by a seperate function. Not implemented at the moment.
   double ifreq;
   double rfreq;
 } s6hits_t;
@@ -42,12 +40,12 @@ typedef struct
   time_t seconds;
   //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
-  //make new function for this?
   std::vector<s6hitsheader_t> s6hitsheaders;
-  int sortby_freq;
+  //these can't both be > 0
+  int sortby_ifreq;
+  int sortby_rfreq;
   int sortby_time;
   int sortby_bors;
-  //int header_only;
   float threshold;
   std::vector<int> bors;
   //same as above but with channels

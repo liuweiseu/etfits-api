@@ -67,9 +67,17 @@ void sort_bors(std::vector<s6hits_t> s6hits);
 
 void sort_time(std::vector<s6hits_t> s6hits);
 
+void sort_ifreq(std::vector<s6hits_t> s6hits);
+
+void sort_rfreq(std::vector<s6hits_t> s6hits);
+
 bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs);
 
 bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs);
+
+bool cmpifreq(const s6hits_t &lhs, const s6hits_t &rhs);
+
+bool cmprfreq(const s6hits_t &lhs, const s6hits_t &rhs);
 
 void sort(s6dataspec_t * s6dataspec);
 
@@ -173,13 +181,11 @@ int get_s6data(s6dataspec_t * s6dataspec)
             hit.ra = ra;
             hit.bors = bors;
             hit.dec = dec;
-            hit.nhits = nhits;
             hit.missedpk = missedpk;
             hit.detected_power = detpow_array[i];
             hit.mean_power = meanpow_array[i];
             int32_t signed_fc = get_signed_fc(finechan_array[i], obs);
             hit.fine_channel_bin = signed_fc;
-            //hit.fine_channel_bin = finechan_array[i];
             hit.coarse_channel_bin = coarch_array[i];
             hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
                                    signed_fc, coarch_array[i]);
@@ -536,27 +542,57 @@ void sort(s6dataspec_t * s6dataspec)
 {
   char const* sort_order[3] = {"", "", ""};
   if (s6dataspec->sortby_bors > 0) {
+    printf("sorting bors\n");
     sort_order[s6dataspec->sortby_bors] = "bors";
   }
   if (s6dataspec->sortby_time > 0) {
+    printf("sorting time\n");
     sort_order[s6dataspec->sortby_time] = "time";
   } 
-  //if (&s6dataspec->sortby_freq > 0) sort_order[&s6dataspec->sortby_freq] = "freq";
+  if (s6dataspec->sortby_ifreq > 0) {
+    printf("sorting ifreq\n");
+    sort_order[s6dataspec->sortby_ifreq] = "ifreq";
+  }
+  if (s6dataspec->sortby_rfreq > 0) {
+    printf("sorting rfreq\n");
+    sort_order[s6dataspec->sortby_rfreq] = "rfreq";
+  }
   for (int i=2; i >= 0; i--) 
   {
-    if (strcmp(sort_order[i], "bors") == 0)
+    if (strcmp(sort_order[i], "bors") == 0) 
       std::stable_sort(s6dataspec->s6hits.begin(), 
                        s6dataspec->s6hits.end(), 
-                       cmpbors);
-    else if (strcmp(sort_order[i], "time") == 0) sort_time(s6dataspec->s6hits);
-    //else if (sort_order[i] == "freq") sort_freq(s6dataspec->s6hits);
+                       cmpbors);    
+    else if (strcmp(sort_order[i], "time") == 0) 
+      std::stable_sort(s6dataspec->s6hits.begin(), 
+                       s6dataspec->s6hits.end(), 
+                       cmptime);    
+    else if (strcmp(sort_order[i], "ifreq") == 0) 
+      std::stable_sort(s6dataspec->s6hits.begin(), 
+                       s6dataspec->s6hits.end(), 
+                       cmpifreq);    
+    else if (strcmp(sort_order[i], "rfreq") == 0) 
+      std::stable_sort(s6dataspec->s6hits.begin(), 
+                       s6dataspec->s6hits.end(), 
+                       cmprfreq);    
     else {;}
   } 
 }
 
+//none of these comparison functions actually work
 bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs)
 {
   return lhs.bors < rhs.bors;
+}
+
+void sort_bors(std::vector<s6hits_t> s6hits)
+{
+  std::stable_sort(s6hits.begin(), s6hits.end(), cmpbors);
+}
+
+bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs)
+{
+  return lhs.unix_time < rhs.unix_time;
 }
 
 void sort_time(std::vector<s6hits_t> s6hits)
@@ -564,9 +600,24 @@ void sort_time(std::vector<s6hits_t> s6hits)
   std::stable_sort(s6hits.begin(), s6hits.end(), cmptime);
 }
 
-bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs)
+bool cmpifreq(const s6hits_t &lhs, const s6hits_t &rhs)
 {
-  return lhs.unix_time < rhs.unix_time;
+  return lhs.ifreq < rhs.ifreq;
+}
+
+void sort_ifreq(std::vector<s6hits_t> s6hits)
+{
+  std::stable_sort(s6hits.begin(), s6hits.end(), cmpifreq);
+}
+
+bool cmprfreq(const s6hits_t &lhs, const s6hits_t &rhs)
+{
+  return lhs.rfreq < rhs.rfreq;
+}
+
+void sort_rfreq(std::vector<s6hits_t> s6hits)
+{
+  std::stable_sort(s6hits.begin(), s6hits.end(), cmprfreq);
 }
 
 time_t get_time_over_file (char * filename) 
