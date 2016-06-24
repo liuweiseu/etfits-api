@@ -24,28 +24,25 @@ typedef struct
   double ra;
   int bors;
   double dec;
-  int nhits;
   int missedpk;
   float detected_power;
   float mean_power;
   unsigned long fine_channel_bin;
   unsigned short coarse_channel_bin;
-  //unimplemented variables: 
-  //double ifreq;
-  //double rfreq;
+  double ifreq;
+  double rfreq;
 } s6hits_t;
 
 typedef struct
 {
   char * filename;
   std::vector<s6hits_t> s6hits;
-  //unimplemented variables
-  //int sortby_freq;
-  //int sortby_time;
-  //int sortby_bors;
-  /float threshold;
-  //std::vector<int> bors;
-  //std::vector<int> channels;
+  int sortby_freq;
+  int sortby_time;
+  int sortby_bors;
+  float threshold;
+  std::vector<int> bors;
+  std::vector<int> channels;
   int errorcode;
 } s6dataspec_t;
 

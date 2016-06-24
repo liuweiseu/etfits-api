@@ -272,7 +272,6 @@ void get_telescope (fitsfile * fptr, int * status, char * telescope)
   fits_read_key(fptr, TSTRING, "TELESCOP", telescope, NULL, status);
   //telescope is in the primary header, this should only run once. If there's an
   //error, something is very wrong.
-  printf("%s\n", telescope);
   if (*status) fits_report_error(stderr, *status);
 }
 
@@ -542,19 +541,15 @@ void sort(s6dataspec_t * s6dataspec)
 {
   char const* sort_order[3] = {"", "", ""};
   if (s6dataspec->sortby_bors > 0) {
-    printf("sorting bors\n");
     sort_order[s6dataspec->sortby_bors] = "bors";
   }
   if (s6dataspec->sortby_time > 0) {
-    printf("sorting time\n");
     sort_order[s6dataspec->sortby_time] = "time";
   } 
   if (s6dataspec->sortby_ifreq > 0) {
-    printf("sorting ifreq\n");
     sort_order[s6dataspec->sortby_ifreq] = "ifreq";
   }
   if (s6dataspec->sortby_rfreq > 0) {
-    printf("sorting rfreq\n");
     sort_order[s6dataspec->sortby_rfreq] = "rfreq";
   }
   for (int i=2; i >= 0; i--) 

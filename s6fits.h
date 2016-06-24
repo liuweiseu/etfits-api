@@ -33,11 +33,9 @@ typedef struct
   int missedpk;  
 } s6hitsheader_t;
 
-typedef struct
+typedef struct s6dataspec_t
 {
   char * filename;
-  //time over the course of one file
-  time_t seconds;
   //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
   std::vector<s6hitsheader_t> s6hitsheaders;
@@ -52,6 +50,11 @@ typedef struct
   std::vector<int> channels;
   //status in cfitsio
   int errorcode;
+  s6dataspec_t() : sortby_ifreq(0),
+                   sortby_rfreq(0),
+                   sortby_time(0),
+                   sortby_bors(0),
+                   threshold(20.0) {}
 } s6dataspec_t;
 
 
