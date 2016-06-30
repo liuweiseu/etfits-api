@@ -111,12 +111,12 @@ class s6hits_t(_object):
     __swig_setmethods__["unix_time"] = _s6fits.s6hits_t_unix_time_set
     __swig_getmethods__["unix_time"] = _s6fits.s6hits_t_unix_time_get
     if _newclass:unix_time = _swig_property(_s6fits.s6hits_t_unix_time_get, _s6fits.s6hits_t_unix_time_set)
-    __swig_setmethods__["ra"] = _s6fits.s6hits_t_ra_set
-    __swig_getmethods__["ra"] = _s6fits.s6hits_t_ra_get
-    if _newclass:ra = _swig_property(_s6fits.s6hits_t_ra_get, _s6fits.s6hits_t_ra_set)
     __swig_setmethods__["bors"] = _s6fits.s6hits_t_bors_set
     __swig_getmethods__["bors"] = _s6fits.s6hits_t_bors_get
     if _newclass:bors = _swig_property(_s6fits.s6hits_t_bors_get, _s6fits.s6hits_t_bors_set)
+    __swig_setmethods__["ra"] = _s6fits.s6hits_t_ra_set
+    __swig_getmethods__["ra"] = _s6fits.s6hits_t_ra_get
+    if _newclass:ra = _swig_property(_s6fits.s6hits_t_ra_get, _s6fits.s6hits_t_ra_set)
     __swig_setmethods__["dec"] = _s6fits.s6hits_t_dec_set
     __swig_getmethods__["dec"] = _s6fits.s6hits_t_dec_get
     if _newclass:dec = _swig_property(_s6fits.s6hits_t_dec_get, _s6fits.s6hits_t_dec_set)
@@ -149,6 +149,45 @@ class s6hits_t(_object):
     __del__ = lambda self : None;
 s6hits_t_swigregister = _s6fits.s6hits_t_swigregister
 s6hits_t_swigregister(s6hits_t)
+
+class s6ccpowers_t(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, s6ccpowers_t, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, s6ccpowers_t, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["julian_date"] = _s6fits.s6ccpowers_t_julian_date_set
+    __swig_getmethods__["julian_date"] = _s6fits.s6ccpowers_t_julian_date_get
+    if _newclass:julian_date = _swig_property(_s6fits.s6ccpowers_t_julian_date_get, _s6fits.s6ccpowers_t_julian_date_set)
+    __swig_setmethods__["unix_time"] = _s6fits.s6ccpowers_t_unix_time_set
+    __swig_getmethods__["unix_time"] = _s6fits.s6ccpowers_t_unix_time_get
+    if _newclass:unix_time = _swig_property(_s6fits.s6ccpowers_t_unix_time_get, _s6fits.s6ccpowers_t_unix_time_set)
+    __swig_setmethods__["ra"] = _s6fits.s6ccpowers_t_ra_set
+    __swig_getmethods__["ra"] = _s6fits.s6ccpowers_t_ra_get
+    if _newclass:ra = _swig_property(_s6fits.s6ccpowers_t_ra_get, _s6fits.s6ccpowers_t_ra_set)
+    __swig_setmethods__["dec"] = _s6fits.s6ccpowers_t_dec_set
+    __swig_getmethods__["dec"] = _s6fits.s6ccpowers_t_dec_get
+    if _newclass:dec = _swig_property(_s6fits.s6ccpowers_t_dec_get, _s6fits.s6ccpowers_t_dec_set)
+    __swig_setmethods__["beam"] = _s6fits.s6ccpowers_t_beam_set
+    __swig_getmethods__["beam"] = _s6fits.s6ccpowers_t_beam_get
+    if _newclass:beam = _swig_property(_s6fits.s6ccpowers_t_beam_get, _s6fits.s6ccpowers_t_beam_set)
+    __swig_setmethods__["coarse_channel_bin"] = _s6fits.s6ccpowers_t_coarse_channel_bin_set
+    __swig_getmethods__["coarse_channel_bin"] = _s6fits.s6ccpowers_t_coarse_channel_bin_get
+    if _newclass:coarse_channel_bin = _swig_property(_s6fits.s6ccpowers_t_coarse_channel_bin_get, _s6fits.s6ccpowers_t_coarse_channel_bin_set)
+    __swig_setmethods__["power_x"] = _s6fits.s6ccpowers_t_power_x_set
+    __swig_getmethods__["power_x"] = _s6fits.s6ccpowers_t_power_x_get
+    if _newclass:power_x = _swig_property(_s6fits.s6ccpowers_t_power_x_get, _s6fits.s6ccpowers_t_power_x_set)
+    __swig_setmethods__["power_y"] = _s6fits.s6ccpowers_t_power_y_set
+    __swig_getmethods__["power_y"] = _s6fits.s6ccpowers_t_power_y_get
+    if _newclass:power_y = _swig_property(_s6fits.s6ccpowers_t_power_y_get, _s6fits.s6ccpowers_t_power_y_set)
+    def __init__(self): 
+        this = _s6fits.new_s6ccpowers_t()
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _s6fits.delete_s6ccpowers_t
+    __del__ = lambda self : None;
+s6ccpowers_t_swigregister = _s6fits.s6ccpowers_t_swigregister
+s6ccpowers_t_swigregister(s6ccpowers_t)
 
 class s6hitsheader_t(_object):
     __swig_setmethods__ = {}
@@ -198,6 +237,9 @@ class s6dataspec_t(_object):
     __swig_setmethods__["s6hits"] = _s6fits.s6dataspec_t_s6hits_set
     __swig_getmethods__["s6hits"] = _s6fits.s6dataspec_t_s6hits_get
     if _newclass:s6hits = _swig_property(_s6fits.s6dataspec_t_s6hits_get, _s6fits.s6dataspec_t_s6hits_set)
+    __swig_setmethods__["s6ccpowers"] = _s6fits.s6dataspec_t_s6ccpowers_set
+    __swig_getmethods__["s6ccpowers"] = _s6fits.s6dataspec_t_s6ccpowers_get
+    if _newclass:s6ccpowers = _swig_property(_s6fits.s6dataspec_t_s6ccpowers_get, _s6fits.s6dataspec_t_s6ccpowers_set)
     __swig_setmethods__["s6hitsheaders"] = _s6fits.s6dataspec_t_s6hitsheaders_set
     __swig_getmethods__["s6hitsheaders"] = _s6fits.s6dataspec_t_s6hitsheaders_get
     if _newclass:s6hitsheaders = _swig_property(_s6fits.s6dataspec_t_s6hitsheaders_get, _s6fits.s6dataspec_t_s6hitsheaders_set)
@@ -225,6 +267,9 @@ class s6dataspec_t(_object):
     __swig_setmethods__["errorcode"] = _s6fits.s6dataspec_t_errorcode_set
     __swig_getmethods__["errorcode"] = _s6fits.s6dataspec_t_errorcode_get
     if _newclass:errorcode = _swig_property(_s6fits.s6dataspec_t_errorcode_get, _s6fits.s6dataspec_t_errorcode_set)
+    __swig_setmethods__["ciftsio_error"] = _s6fits.s6dataspec_t_ciftsio_error_set
+    __swig_getmethods__["ciftsio_error"] = _s6fits.s6dataspec_t_ciftsio_error_get
+    if _newclass:ciftsio_error = _swig_property(_s6fits.s6dataspec_t_ciftsio_error_get, _s6fits.s6dataspec_t_ciftsio_error_set)
     def __init__(self): 
         this = _s6fits.new_s6dataspec_t()
         try: self.this.append(this)
@@ -238,6 +283,10 @@ s6dataspec_t_swigregister(s6dataspec_t)
 def get_s6data(*args):
   return _s6fits.get_s6data(*args)
 get_s6data = _s6fits.get_s6data
+
+def get_s6ccpowers(*args):
+  return _s6fits.get_s6ccpowers(*args)
+get_s6ccpowers = _s6fits.get_s6ccpowers
 
 def get_s6hitsheaders(*args):
   return _s6fits.get_s6hitsheaders(*args)
@@ -262,6 +311,10 @@ print_hits_table = _s6fits.print_hits_table
 def print_hits_header_table(*args):
   return _s6fits.print_hits_header_table(*args)
 print_hits_header_table = _s6fits.print_hits_header_table
+
+def print_ccpowers_table(*args):
+  return _s6fits.print_ccpowers_table(*args)
+print_ccpowers_table = _s6fits.print_ccpowers_table
 class s6Vector(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, s6Vector, name, value)

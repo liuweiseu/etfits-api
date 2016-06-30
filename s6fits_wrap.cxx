@@ -2944,21 +2944,23 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_int32_t swig_types[3]
 #define SWIGTYPE_p_long swig_types[4]
 #define SWIGTYPE_p_p_PyObject swig_types[5]
-#define SWIGTYPE_p_s6dataspec_t swig_types[6]
-#define SWIGTYPE_p_s6hits_t swig_types[7]
-#define SWIGTYPE_p_s6hitsheader_t swig_types[8]
-#define SWIGTYPE_p_size_type swig_types[9]
-#define SWIGTYPE_p_std__allocatorT_int_t swig_types[10]
-#define SWIGTYPE_p_std__allocatorT_s6hits_t_t swig_types[11]
-#define SWIGTYPE_p_std__invalid_argument swig_types[12]
-#define SWIGTYPE_p_std__vectorT__Tp__Alloc_t swig_types[13]
-#define SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t swig_types[14]
-#define SWIGTYPE_p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t swig_types[15]
-#define SWIGTYPE_p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t swig_types[16]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[17]
-#define SWIGTYPE_p_value_type swig_types[18]
-static swig_type_info *swig_types[20];
-static swig_module_info swig_module = {swig_types, 19, 0, 0, 0, 0};
+#define SWIGTYPE_p_s6ccpowers_t swig_types[6]
+#define SWIGTYPE_p_s6dataspec_t swig_types[7]
+#define SWIGTYPE_p_s6hits_t swig_types[8]
+#define SWIGTYPE_p_s6hitsheader_t swig_types[9]
+#define SWIGTYPE_p_size_type swig_types[10]
+#define SWIGTYPE_p_std__allocatorT_int_t swig_types[11]
+#define SWIGTYPE_p_std__allocatorT_s6hits_t_t swig_types[12]
+#define SWIGTYPE_p_std__invalid_argument swig_types[13]
+#define SWIGTYPE_p_std__vectorT__Tp__Alloc_t swig_types[14]
+#define SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t swig_types[15]
+#define SWIGTYPE_p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t swig_types[16]
+#define SWIGTYPE_p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t swig_types[17]
+#define SWIGTYPE_p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t swig_types[18]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[19]
+#define SWIGTYPE_p_value_type swig_types[20]
+static swig_type_info *swig_types[22];
+static swig_module_info swig_module = {swig_types, 21, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3475,50 +3477,6 @@ SWIGINTERNINLINE PyObject*
 }
 
 
-/* Getting isfinite working pre C99 across multiple platforms is non-trivial. Users can provide SWIG_isfinite on older platforms. */
-#ifndef SWIG_isfinite
-# if defined(isfinite)
-#  define SWIG_isfinite(X) (isfinite(X))
-# elif defined(_MSC_VER)
-#  define SWIG_isfinite(X) (_finite(X))
-# elif defined(__sun) && defined(__SVR4)
-#  include <ieeefp.h>
-#  define SWIG_isfinite(X) (finite(X))
-# endif
-#endif
-
-
-/* Accept infinite as a valid float value unless we are unable to check if a value is finite */
-#ifdef SWIG_isfinite
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX) && SWIG_isfinite(X))
-#else
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX))
-#endif
-
-
-SWIGINTERN int
-SWIG_AsVal_float (PyObject * obj, float *val)
-{
-  double v;
-  int res = SWIG_AsVal_double (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if (SWIG_Float_Overflow_Check(v)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< float >(v);
-    }
-  }  
-  return res;
-}
-
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_float  (float value)
-{    
-  return SWIG_From_double  (value);
-}
-
-
 SWIGINTERN int
 SWIG_AsVal_unsigned_SS_short (PyObject * obj, unsigned short *val)
 {
@@ -3667,6 +3625,50 @@ SWIGINTERNINLINE PyObject *
 SWIG_FromCharPtr(const char *cptr)
 { 
   return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
+}
+
+
+/* Getting isfinite working pre C99 across multiple platforms is non-trivial. Users can provide SWIG_isfinite on older platforms. */
+#ifndef SWIG_isfinite
+# if defined(isfinite)
+#  define SWIG_isfinite(X) (isfinite(X))
+# elif defined(_MSC_VER)
+#  define SWIG_isfinite(X) (_finite(X))
+# elif defined(__sun) && defined(__SVR4)
+#  include <ieeefp.h>
+#  define SWIG_isfinite(X) (finite(X))
+# endif
+#endif
+
+
+/* Accept infinite as a valid float value unless we are unable to check if a value is finite */
+#ifdef SWIG_isfinite
+# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX) && SWIG_isfinite(X))
+#else
+# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX))
+#endif
+
+
+SWIGINTERN int
+SWIG_AsVal_float (PyObject * obj, float *val)
+{
+  double v;
+  int res = SWIG_AsVal_double (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if (SWIG_Float_Overflow_Check(v)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< float >(v);
+    }
+  }  
+  return res;
+}
+
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_float  (float value)
+{    
+  return SWIG_From_double  (value);
 }
 
 
@@ -5950,58 +5952,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_s6hits_t_ra_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  s6hits_t *arg1 = (s6hits_t *) 0 ;
-  double arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_ra_set",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_ra_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
-  }
-  arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  ecode2 = SWIG_AsVal_double(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_ra_set" "', argument " "2"" of type '" "double""'");
-  } 
-  arg2 = static_cast< double >(val2);
-  if (arg1) (arg1)->ra = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_s6hits_t_ra_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  s6hits_t *arg1 = (s6hits_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  double result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_ra_get",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_ra_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
-  }
-  arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  result = (double) ((arg1)->ra);
-  resultobj = SWIG_From_double(static_cast< double >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_s6hits_t_bors_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *arg1 = (s6hits_t *) 0 ;
@@ -6048,6 +5998,58 @@ SWIGINTERN PyObject *_wrap_s6hits_t_bors_get(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
   result = (int) ((arg1)->bors);
   resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6hits_t_ra_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6hits_t *arg1 = (s6hits_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_ra_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_ra_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6hits_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_ra_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->ra = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6hits_t_ra_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6hits_t *arg1 = (s6hits_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_ra_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_ra_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6hits_t * >(argp1);
+  result = (double) ((arg1)->ra);
+  resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6161,10 +6163,10 @@ fail:
 SWIGINTERN PyObject *_wrap_s6hits_t_detected_power_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *arg1 = (s6hits_t *) 0 ;
-  float arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  float val2 ;
+  double val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -6175,11 +6177,11 @@ SWIGINTERN PyObject *_wrap_s6hits_t_detected_power_set(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_detected_power_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_detected_power_set" "', argument " "2"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_detected_power_set" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< float >(val2);
+  arg2 = static_cast< double >(val2);
   if (arg1) (arg1)->detected_power = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -6194,7 +6196,7 @@ SWIGINTERN PyObject *_wrap_s6hits_t_detected_power_get(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  float result;
+  double result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_detected_power_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
@@ -6202,8 +6204,8 @@ SWIGINTERN PyObject *_wrap_s6hits_t_detected_power_get(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_detected_power_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  result = (float) ((arg1)->detected_power);
-  resultobj = SWIG_From_float(static_cast< float >(result));
+  result = (double) ((arg1)->detected_power);
+  resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6213,10 +6215,10 @@ fail:
 SWIGINTERN PyObject *_wrap_s6hits_t_mean_power_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *arg1 = (s6hits_t *) 0 ;
-  float arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  float val2 ;
+  double val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -6227,11 +6229,11 @@ SWIGINTERN PyObject *_wrap_s6hits_t_mean_power_set(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_mean_power_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_mean_power_set" "', argument " "2"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_mean_power_set" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< float >(val2);
+  arg2 = static_cast< double >(val2);
   if (arg1) (arg1)->mean_power = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -6246,7 +6248,7 @@ SWIGINTERN PyObject *_wrap_s6hits_t_mean_power_get(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  float result;
+  double result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_mean_power_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
@@ -6254,8 +6256,8 @@ SWIGINTERN PyObject *_wrap_s6hits_t_mean_power_get(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_mean_power_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  result = (float) ((arg1)->mean_power);
-  resultobj = SWIG_From_float(static_cast< float >(result));
+  result = (double) ((arg1)->mean_power);
+  resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6516,6 +6518,463 @@ SWIGINTERN PyObject *s6hits_t_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_s6hits_t, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_julian_date_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_julian_date_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_julian_date_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_julian_date_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->julian_date = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_julian_date_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_julian_date_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_julian_date_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (double) ((arg1)->julian_date);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_unix_time_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  time_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  long val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_unix_time_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_unix_time_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_long(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_unix_time_set" "', argument " "2"" of type '" "time_t""'");
+  } 
+  arg2 = static_cast< time_t >(val2);
+  if (arg1) (arg1)->unix_time = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_unix_time_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  time_t result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_unix_time_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_unix_time_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (time_t) ((arg1)->unix_time);
+  resultobj = SWIG_From_long(static_cast< long >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_ra_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_ra_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_ra_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_ra_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->ra = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_ra_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_ra_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_ra_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (double) ((arg1)->ra);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_dec_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_dec_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_dec_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_dec_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->dec = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_dec_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_dec_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_dec_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (double) ((arg1)->dec);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_beam_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_beam_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_beam_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_beam_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  if (arg1) (arg1)->beam = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_beam_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_beam_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_beam_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (int) ((arg1)->beam);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_coarse_channel_bin_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_coarse_channel_bin_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_coarse_channel_bin_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_coarse_channel_bin_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->coarse_channel_bin = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_coarse_channel_bin_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_coarse_channel_bin_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_coarse_channel_bin_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (double) ((arg1)->coarse_channel_bin);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_power_x_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_power_x_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_power_x_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_power_x_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->power_x = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_power_x_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_power_x_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_power_x_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (double) ((arg1)->power_x);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_power_y_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6ccpowers_t_power_y_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_power_y_set" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6ccpowers_t_power_y_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->power_y = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6ccpowers_t_power_y_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6ccpowers_t_power_y_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6ccpowers_t_power_y_get" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  result = (double) ((arg1)->power_y);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_s6ccpowers_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)":new_s6ccpowers_t")) SWIG_fail;
+  result = (s6ccpowers_t *)new s6ccpowers_t();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_s6ccpowers_t, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_s6ccpowers_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6ccpowers_t *arg1 = (s6ccpowers_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_s6ccpowers_t",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6ccpowers_t, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_s6ccpowers_t" "', argument " "1"" of type '" "s6ccpowers_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6ccpowers_t * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *s6ccpowers_t_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_s6ccpowers_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -7037,6 +7496,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_s6dataspec_t_s6ccpowers_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > *arg2 = (std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6dataspec_t_s6ccpowers_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_s6ccpowers_set" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "s6dataspec_t_s6ccpowers_set" "', argument " "2"" of type '" "std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > *""'"); 
+  }
+  arg2 = reinterpret_cast< std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > * >(argp2);
+  if (arg1) (arg1)->s6ccpowers = *arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6dataspec_t_s6ccpowers_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6dataspec_t_s6ccpowers_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_s6ccpowers_get" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  result = (std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > *)& ((arg1)->s6ccpowers);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_s6dataspec_t_s6hitsheaders_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
@@ -7505,6 +8016,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_s6dataspec_t_ciftsio_error_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6dataspec_t_ciftsio_error_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_ciftsio_error_set" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6dataspec_t_ciftsio_error_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  if (arg1) (arg1)->ciftsio_error = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6dataspec_t_ciftsio_error_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6dataspec_t_ciftsio_error_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_ciftsio_error_get" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  result = (int) ((arg1)->ciftsio_error);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_new_s6dataspec_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6dataspec_t *result = 0 ;
@@ -7561,6 +8124,28 @@ SWIGINTERN PyObject *_wrap_get_s6data(PyObject *SWIGUNUSEDPARM(self), PyObject *
   }
   arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
   result = (int)get_s6data(arg1);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_get_s6ccpowers(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:get_s6ccpowers",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "get_s6ccpowers" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  result = (int)get_s6ccpowers(arg1);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
@@ -7720,6 +8305,35 @@ SWIGINTERN PyObject *_wrap_print_hits_header_table(PyObject *SWIGUNUSEDPARM(self
     }
   }
   print_hits_header_table(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_print_ccpowers_table(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  SwigValueWrapper< std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > > arg1 ;
+  void *argp1 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:print_ccpowers_table",&obj0)) SWIG_fail;
+  {
+    res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t,  0  | 0);
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "print_ccpowers_table" "', argument " "1"" of type '" "std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > >""'"); 
+    }  
+    if (!argp1) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "print_ccpowers_table" "', argument " "1"" of type '" "std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > >""'");
+    } else {
+      std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > * temp = reinterpret_cast< std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > * >(argp1);
+      arg1 = *temp;
+      if (SWIG_IsNewObj(res1)) delete temp;
+    }
+  }
+  print_ccpowers_table(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -11547,10 +12161,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6hits_t_julian_date_get", _wrap_s6hits_t_julian_date_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_unix_time_set", _wrap_s6hits_t_unix_time_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_unix_time_get", _wrap_s6hits_t_unix_time_get, METH_VARARGS, NULL},
-	 { (char *)"s6hits_t_ra_set", _wrap_s6hits_t_ra_set, METH_VARARGS, NULL},
-	 { (char *)"s6hits_t_ra_get", _wrap_s6hits_t_ra_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_bors_set", _wrap_s6hits_t_bors_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_bors_get", _wrap_s6hits_t_bors_get, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_ra_set", _wrap_s6hits_t_ra_set, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_ra_get", _wrap_s6hits_t_ra_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_dec_set", _wrap_s6hits_t_dec_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_dec_get", _wrap_s6hits_t_dec_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_missedpk_set", _wrap_s6hits_t_missedpk_set, METH_VARARGS, NULL},
@@ -11570,6 +12184,25 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_s6hits_t", _wrap_new_s6hits_t, METH_VARARGS, NULL},
 	 { (char *)"delete_s6hits_t", _wrap_delete_s6hits_t, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_swigregister", s6hits_t_swigregister, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_julian_date_set", _wrap_s6ccpowers_t_julian_date_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_julian_date_get", _wrap_s6ccpowers_t_julian_date_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_unix_time_set", _wrap_s6ccpowers_t_unix_time_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_unix_time_get", _wrap_s6ccpowers_t_unix_time_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_ra_set", _wrap_s6ccpowers_t_ra_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_ra_get", _wrap_s6ccpowers_t_ra_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_dec_set", _wrap_s6ccpowers_t_dec_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_dec_get", _wrap_s6ccpowers_t_dec_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_beam_set", _wrap_s6ccpowers_t_beam_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_beam_get", _wrap_s6ccpowers_t_beam_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_coarse_channel_bin_set", _wrap_s6ccpowers_t_coarse_channel_bin_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_coarse_channel_bin_get", _wrap_s6ccpowers_t_coarse_channel_bin_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_power_x_set", _wrap_s6ccpowers_t_power_x_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_power_x_get", _wrap_s6ccpowers_t_power_x_get, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_power_y_set", _wrap_s6ccpowers_t_power_y_set, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_power_y_get", _wrap_s6ccpowers_t_power_y_get, METH_VARARGS, NULL},
+	 { (char *)"new_s6ccpowers_t", _wrap_new_s6ccpowers_t, METH_VARARGS, NULL},
+	 { (char *)"delete_s6ccpowers_t", _wrap_delete_s6ccpowers_t, METH_VARARGS, NULL},
+	 { (char *)"s6ccpowers_t_swigregister", s6ccpowers_t_swigregister, METH_VARARGS, NULL},
 	 { (char *)"s6hitsheader_t_julian_date_set", _wrap_s6hitsheader_t_julian_date_set, METH_VARARGS, NULL},
 	 { (char *)"s6hitsheader_t_julian_date_get", _wrap_s6hitsheader_t_julian_date_get, METH_VARARGS, NULL},
 	 { (char *)"s6hitsheader_t_unix_time_set", _wrap_s6hitsheader_t_unix_time_set, METH_VARARGS, NULL},
@@ -11591,6 +12224,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6dataspec_t_filename_get", _wrap_s6dataspec_t_filename_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_s6hits_set", _wrap_s6dataspec_t_s6hits_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_s6hits_get", _wrap_s6dataspec_t_s6hits_get, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_s6ccpowers_set", _wrap_s6dataspec_t_s6ccpowers_set, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_s6ccpowers_get", _wrap_s6dataspec_t_s6ccpowers_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_s6hitsheaders_set", _wrap_s6dataspec_t_s6hitsheaders_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_s6hitsheaders_get", _wrap_s6dataspec_t_s6hitsheaders_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_sortby_ifreq_set", _wrap_s6dataspec_t_sortby_ifreq_set, METH_VARARGS, NULL},
@@ -11609,16 +12244,20 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6dataspec_t_channels_get", _wrap_s6dataspec_t_channels_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_errorcode_set", _wrap_s6dataspec_t_errorcode_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_errorcode_get", _wrap_s6dataspec_t_errorcode_get, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_ciftsio_error_set", _wrap_s6dataspec_t_ciftsio_error_set, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_ciftsio_error_get", _wrap_s6dataspec_t_ciftsio_error_get, METH_VARARGS, NULL},
 	 { (char *)"new_s6dataspec_t", _wrap_new_s6dataspec_t, METH_VARARGS, NULL},
 	 { (char *)"delete_s6dataspec_t", _wrap_delete_s6dataspec_t, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_swigregister", s6dataspec_t_swigregister, METH_VARARGS, NULL},
 	 { (char *)"get_s6data", _wrap_get_s6data, METH_VARARGS, NULL},
+	 { (char *)"get_s6ccpowers", _wrap_get_s6ccpowers, METH_VARARGS, NULL},
 	 { (char *)"get_s6hitsheaders", _wrap_get_s6hitsheaders, METH_VARARGS, NULL},
 	 { (char *)"get_time_over_file", _wrap_get_time_over_file, METH_VARARGS, NULL},
 	 { (char *)"get_hits_over_file", _wrap_get_hits_over_file, METH_VARARGS, NULL},
 	 { (char *)"print_hits_structure", _wrap_print_hits_structure, METH_VARARGS, NULL},
 	 { (char *)"print_hits_table", _wrap_print_hits_table, METH_VARARGS, NULL},
 	 { (char *)"print_hits_header_table", _wrap_print_hits_header_table, METH_VARARGS, NULL},
+	 { (char *)"print_ccpowers_table", _wrap_print_ccpowers_table, METH_VARARGS, NULL},
 	 { (char *)"s6Vector_iterator", _wrap_s6Vector_iterator, METH_VARARGS, NULL},
 	 { (char *)"s6Vector___nonzero__", _wrap_s6Vector___nonzero__, METH_VARARGS, NULL},
 	 { (char *)"s6Vector___bool__", _wrap_s6Vector___bool__, METH_VARARGS, NULL},
@@ -11699,6 +12338,7 @@ static swig_type_info _swigt__p_difference_type = {"_p_difference_type", "differ
 static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long = {"_p_long", "long *|time_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_s6ccpowers_t = {"_p_s6ccpowers_t", "s6ccpowers_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_s6dataspec_t = {"_p_s6dataspec_t", "s6dataspec_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_s6hits_t = {"_p_s6hits_t", "std::vector< s6hits_t >::value_type *|s6hits_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_s6hitsheader_t = {"_p_s6hitsheader_t", "s6hitsheader_t *", 0, 0, (void*)0, 0};
@@ -11708,6 +12348,7 @@ static swig_type_info _swigt__p_std__allocatorT_s6hits_t_t = {"_p_std__allocator
 static swig_type_info _swigt__p_std__invalid_argument = {"_p_std__invalid_argument", "std::invalid_argument *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT__Tp__Alloc_t = {"_p_std__vectorT__Tp__Alloc_t", "std::vector< _Tp,_Alloc > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_int_std__allocatorT_int_t_t = {"_p_std__vectorT_int_std__allocatorT_int_t_t", "std::vector< int,std::allocator< int > > *|std::vector< int > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t = {"_p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t", "std::vector< s6ccpowers_t,std::allocator< s6ccpowers_t > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t = {"_p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t", "std::vector< s6hits_t,std::allocator< s6hits_t > > *|std::vector< s6hits_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t = {"_p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t", "std::vector< s6hitsheader_t,std::allocator< s6hitsheader_t > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_swig__SwigPyIterator = {"_p_swig__SwigPyIterator", "swig::SwigPyIterator *", 0, 0, (void*)0, 0};
@@ -11720,6 +12361,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_int32_t,
   &_swigt__p_long,
   &_swigt__p_p_PyObject,
+  &_swigt__p_s6ccpowers_t,
   &_swigt__p_s6dataspec_t,
   &_swigt__p_s6hits_t,
   &_swigt__p_s6hitsheader_t,
@@ -11729,6 +12371,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_std__invalid_argument,
   &_swigt__p_std__vectorT__Tp__Alloc_t,
   &_swigt__p_std__vectorT_int_std__allocatorT_int_t_t,
+  &_swigt__p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t,
   &_swigt__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t,
   &_swigt__p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t,
   &_swigt__p_swig__SwigPyIterator,
@@ -11741,6 +12384,7 @@ static swig_cast_info _swigc__p_difference_type[] = {  {&_swigt__p_difference_ty
 static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long[] = {  {&_swigt__p_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_PyObject[] = {  {&_swigt__p_p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_s6ccpowers_t[] = {  {&_swigt__p_s6ccpowers_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_s6dataspec_t[] = {  {&_swigt__p_s6dataspec_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_s6hits_t[] = {  {&_swigt__p_s6hits_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_s6hitsheader_t[] = {  {&_swigt__p_s6hitsheader_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -11750,6 +12394,7 @@ static swig_cast_info _swigc__p_std__allocatorT_s6hits_t_t[] = {  {&_swigt__p_st
 static swig_cast_info _swigc__p_std__invalid_argument[] = {  {&_swigt__p_std__invalid_argument, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT__Tp__Alloc_t[] = {  {&_swigt__p_std__vectorT__Tp__Alloc_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_int_std__allocatorT_int_t_t[] = {  {&_swigt__p_std__vectorT_int_std__allocatorT_int_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t[] = {  {&_swigt__p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t[] = {  {&_swigt__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t[] = {  {&_swigt__p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_swig__SwigPyIterator[] = {  {&_swigt__p_swig__SwigPyIterator, 0, 0, 0},{0, 0, 0, 0}};
@@ -11762,6 +12407,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_int32_t,
   _swigc__p_long,
   _swigc__p_p_PyObject,
+  _swigc__p_s6ccpowers_t,
   _swigc__p_s6dataspec_t,
   _swigc__p_s6hits_t,
   _swigc__p_s6hitsheader_t,
@@ -11771,6 +12417,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_std__invalid_argument,
   _swigc__p_std__vectorT__Tp__Alloc_t,
   _swigc__p_std__vectorT_int_std__allocatorT_int_t_t,
+  _swigc__p_std__vectorT_s6ccpowers_t_std__allocatorT_s6ccpowers_t_t_t,
   _swigc__p_std__vectorT_s6hits_t_std__allocatorT_s6hits_t_t_t,
   _swigc__p_std__vectorT_s6hitsheader_t_std__allocatorT_s6hitsheader_t_t_t,
   _swigc__p_swig__SwigPyIterator,
