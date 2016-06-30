@@ -8,7 +8,11 @@
 #include <algorithm>
 
 /*function declarations*/
+int get_nsubband (fitsfile * fptr, int * status);
+
 void get_telescope (fitsfile * fptr, int * status, char * telescope);
+
+float get_threshold (fitsfile * fptr, int * status);
 
 time_t get_time (fitsfile * fptr, int * status);
 
@@ -54,6 +58,8 @@ int is_gbtstatus(fitsfile * fptr, int * status,
                  char * obs, int * obs_flag);
 
 int is_ethits (fitsfile * fptr, int * status);
+
+int is_ccpowers (fitsfile * fptr, int * status);
 
 int is_desired_bors (int bors, std::vector<int> desired_bors);
 
@@ -110,6 +116,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
       if (hdupos == 0)
       {
         get_telescope(fptr, &status, telescope);
+        s6dataspec->threshold = get_threshold(fptr, &status);
       }
       //checks if the header we're looking at correspond to aoscram or gbt, and
       //if they do, get the coarchid and clock frequency once. Also sets the
@@ -155,12 +162,12 @@ int get_s6data(s6dataspec_t * s6dataspec)
         fits_get_num_rows(fptr, &nrows, &status);
         fits_get_num_cols(fptr, &ncols, &status); 
         
-        float detpow_array[nrows];
-        fits_read_col (fptr, TFLOAT, 1, 1, 1, nrows, NULL,
+        double detpow_array[nrows];
+        fits_read_col (fptr, TDOUBLE, 1, 1, 1, nrows, NULL,
             &detpow_array, &anynul, &status); 
 
-        float meanpow_array[nrows];
-        fits_read_col (fptr, TFLOAT, 2, 1, 1, nrows, NULL,
+        double meanpow_array[nrows];
+        fits_read_col (fptr, TDOUBLE, 2, 1, 1, nrows, NULL,
             &meanpow_array, &anynul, &status); 
 
         unsigned short coarch_array[nrows];
@@ -211,7 +218,135 @@ int get_s6data(s6dataspec_t * s6dataspec)
  
   if (status) fits_report_error(stderr, status);
   
-  s6dataspec->errorcode = status; 
+  s6dataspec->ciftsio_error = status; 
+  if (status > 0) s6dataspec->errorcode += 1;
+
+  sort(s6dataspec);
+  
+  return (status);
+}
+
+int get_s6ccpowers(s6dataspec_t * s6dataspec) 
+{
+  fitsfile *fptr;
+  /*status must be initialized to zero!*/
+  int status = 0;
+  int hdupos = 0, nkeys;
+  int flag = 0;
+  int obs_flag = 0;
+  char * filename = s6dataspec->filename;
+  int coarchid, clock_freq;
+  /*observatory, if another gets added with length > 3 change this*/
+  char telescope[FLEN_VALUE];
+  char obs[10];
+  int nsubband;
+  //double if2synhz, if1synhz;
+  //double ifv1iffq, ifv1csfq;
+  //char ifv1ssb[FLEN_VALUE];
+  if (!fits_open_file(&fptr, filename, READONLY, &status))
+  {
+    //fits_get_hdu_num(fptr, &hdupos); 
+    for (; !status; hdupos++) 
+    {
+      //primary header
+      if (hdupos == 0)
+      {
+        get_telescope(fptr, &status, telescope);
+        s6dataspec->threshold = get_threshold(fptr, &status);
+        nsubband = get_nsubband (fptr, &status);
+      }
+      //checks if the header we're looking at correspond to aoscram or gbt, and
+      //if they do, get the coarchid and clock frequency once. Also sets the
+      //observatory.
+      if (is_aoscram(fptr, &status, obs, &obs_flag) || 
+          is_gbtstatus(fptr, &status, obs, &obs_flag))
+      {
+        if (!flag) 
+        {
+          coarchid = get_coarchid(fptr, &status);
+          clock_freq = get_clock_freq(fptr, &status);
+          flag = 1;
+        }
+        /*if (strcmp(obs, "AO") == 0) 
+        {
+          if (strcmp(telescope, "AO_327MHz") == 0)
+          {
+            if2synhz = get_if2synhz(fptr, &status);
+          }
+          if1synhz = get_if1synhz(fptr, &status); 
+        }
+        else if (strcmp(obs, "GBT") == 0) 
+        {
+          get_ifv1ssb(fptr, &status, ifv1ssb);
+          ifv1iffq = get_ifv1iffq(fptr, &status);
+          ifv1csfq = get_ifv1csfq(fptr, &status); 
+        }*/
+      }
+      /* calculated and saved before we make the hit to save us the hassle of
+ * grabbing it for each new hit in the binary table*/
+      time_t time = get_time(fptr, &status);
+      double ra = get_RA(fptr, &status);
+      double dec = get_dec(fptr, &status);
+      if (is_ccpowers(fptr, &status))
+      {
+        int ncols, anynul;
+        long nrows; 
+
+        fits_get_num_rows(fptr, &nrows, &status);
+        fits_get_num_cols(fptr, &ncols, &status);        
+
+        double polx_array[nrows];
+        fits_read_col (fptr, TDOUBLE, 1, 1, 1, nrows, NULL,
+            &polx_array, &anynul, &status); 
+
+        double poly_array[nrows];
+        fits_read_col (fptr, TDOUBLE, 2, 1, 1, nrows, NULL,
+            &poly_array, &anynul, &status); 
+
+        for (int i = 0; i < nrows; i++) 
+        {
+          s6ccpowers_t ccpowers;
+          ccpowers.unix_time = time;
+          ccpowers.julian_date = get_julian_from_unix((int) time);
+          ccpowers.ra = ra;
+          ccpowers.dec = dec;
+          if (strcmp(obs, "AO") == 0) 
+          {
+            ccpowers.beam = i/(nsubband-1);
+            ccpowers.coarse_channel_bin = i - (nsubband * ccpowers.beam);
+          }
+          else
+          { 
+            ccpowers.beam = 1;
+            ccpowers.coarse_channel_bin = i;
+          }
+          ccpowers.power_x = polx_array[i];
+          ccpowers.power_y = poly_array[i];
+          /*hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
+                                 signed_fc, coarch_array[i]);
+          if (strcmp(obs, "AO") == 0) 
+            hit.rfreq = calc_ao_rfreq(telescope, if1synhz, 
+                                      if2synhz, hit.ifreq);
+          else if (strcmp(obs, "GBT") == 0) 
+            hit.rfreq = calc_gbt_rfreq(hit.ifreq, ifv1csfq, 
+                                       ifv1iffq, ifv1ssb);
+          else hit.rfreq = -1;*/
+          s6dataspec->s6ccpowers.push_back(ccpowers);
+        } 
+      }
+      
+      /*moves to next HDU*/
+      fits_get_hdrspace(fptr, &nkeys, NULL, &status); 
+      fits_movrel_hdu(fptr, 1, NULL, &status);
+    }  
+  }    
+  status = 0;
+  fits_close_file(fptr, &status);
+ 
+  if (status) fits_report_error(stderr, status);
+  
+  s6dataspec->ciftsio_error = status; 
+  if (status > 0) s6dataspec->errorcode += 1;
 
   sort(s6dataspec);
   
@@ -259,11 +394,29 @@ int get_s6hitsheaders(s6dataspec_t * s6dataspec)
  
   if (status) fits_report_error(stderr, status);
   
-  s6dataspec->errorcode = status; 
+  s6dataspec->ciftsio_error = status; 
+  if (status > 0) s6dataspec->errorcode += 1;
 
   sort(s6dataspec);
   
   return (status);
+}
+
+//delete later
+int get_nsubband (fitsfile * fptr, int * status) 
+{
+  int nsubs;
+  fits_read_key(fptr, TINT, "NSUBBAND", &nsubs, NULL, status);
+  if (*status == KEY_NO_EXIST) nsubs = -1, *status=0;
+  return (nsubs);
+}
+
+float get_threshold (fitsfile * fptr, int * status) 
+{
+  float threshold;
+  fits_read_key(fptr, TFLOAT, "THRSHOLD", &threshold, NULL, status);
+  if (*status == KEY_NO_EXIST) threshold = 20.0, *status=0;
+  return (threshold);
 }
 
 /*gets telescope found in primary header*/
@@ -502,6 +655,15 @@ int is_ethits (fitsfile * fptr, int * status)
   else return 0; 
 }
 
+int is_ccpowers (fitsfile * fptr, int * status)
+{
+  char extname[16];
+  fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);  
+  if (*status == KEY_NO_EXIST) *status=0;
+  if (strcmp(extname, "CCPWRS") == 0) return 1;
+  else return 0; 
+}
+
 /*convert from unix time to julian date*/
 double get_julian_from_unix (int unix_time)
 {
@@ -720,6 +882,29 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
   }
 }
 
+void print_ccpowers_table (std::vector<s6ccpowers_t> s6ccpowers)
+{
+  printf("%15s", "Unix Time");
+  printf("%20s", "Julian Date");
+  printf("%10s", "RA");
+  printf("%15s", "DEC");
+  printf("%10s", "COARCHAN"); 
+  printf("%20s", "POWER XPOL");
+  printf("%20s\n", "POWER YPOL");
+  //printf("%15s", "ifreq");
+  //printf("%15s\n", "rfreq");
+  for (std::vector<s6ccpowers_t>::iterator ccpowers = s6ccpowers.begin() ; 
+         ccpowers != s6ccpowers.end(); ++ccpowers)
+  {
+    printf("%15d", (int) ccpowers->unix_time);
+    printf("%20f", ccpowers->julian_date);
+    printf("%10g", ccpowers->ra);
+    printf("%15g", ccpowers->dec);
+    printf("%10d", (int)ccpowers->coarse_channel_bin);
+    printf("%20f", ccpowers->power_x);
+    printf("%20f\n", ccpowers->power_y);
+  }
+}
 void print_hits_header_table (std::vector<s6hitsheader_t> s6hitsheaders)
 {
   printf("%15s", "Unix Time");
