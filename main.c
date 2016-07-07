@@ -18,8 +18,7 @@ int main(int argc, char *argv[])
   //we need to be careful here since this will probably break hardcore if
   //someone accidentally sorts by both ifreq and rfreq, or if they try to sort
   //by any frequency when trying to get only headers
-  get_s6ccpowers(&s6dataspec);
-  printf("threshold: %f\n", s6dataspec.threshold);
-  print_ccpowers_table(s6dataspec.s6ccpowers);
+  get_s6data(&s6dataspec);
+  print_hits_table(s6dataspec.s6hits);
   return 0;
 }

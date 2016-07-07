@@ -67,10 +67,10 @@ typedef struct s6dataspec_t
   int errorcode;
   //status in cfitsio
   int ciftsio_error;
-  s6dataspec_t() : sortby_ifreq(0),
+  /*s6dataspec_t() : sortby_ifreq(0),
                    sortby_rfreq(0),
                    sortby_time(0),
-                   sortby_bors(0) {}
+                   sortby_bors(0) {}*/
 } s6dataspec_t;
 
 

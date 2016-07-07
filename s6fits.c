@@ -185,7 +185,10 @@ int get_s6data(s6dataspec_t * s6dataspec)
             s6hits_t hit;
             hit.unix_time = time;
             hit.julian_date = get_julian_from_unix((int) time);
-            hit.ra = ra;
+            if (strcmp(obs, "GBT") == 0) 
+              hit.ra = ra/15;
+            else 
+              hit.ra = ra;
             hit.bors = bors;
             hit.dec = dec;
             hit.missedpk = missedpk;
