@@ -15,6 +15,10 @@ int main(int argc, char *argv[])
   //bors.push_back(3);
   //bors.push_back(6);
   //s6dataspec.bors = bors;
+  s6dataspec.sortby_bors = 0;
+  s6dataspec.sortby_time = 0;
+  s6dataspec.sortby_ifreq = 0;
+  s6dataspec.sortby_rfreq = 0;
   //we need to be careful here since this will probably break hardcore if
   //someone accidentally sorts by both ifreq and rfreq, or if they try to sort
   //by any frequency when trying to get only headers

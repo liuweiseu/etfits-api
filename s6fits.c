@@ -585,7 +585,7 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   { 
     fc_per_cc = pow(2.0, 17);
   }
-  int cc_per_sys = 4096;
+  double cc_per_sys = 4096;
   double band_width = clock_freq/2;
   double fc_bin_width = band_width/(cc_per_sys * fc_per_cc);
   double resolution = fc_bin_width * 1000000;    

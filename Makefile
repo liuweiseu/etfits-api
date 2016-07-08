@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-I$(IDIR) -I/usr/include/python2.6 -Wall -fPIC 
+CFLAGS=-I$(IDIR) -I/usr/include/python2.6 -Wall -fPIC -g
 LDFLAGS = -shared
 LIBS= -lm -lcfitsio -lpython2.6
 IDIR=/usr/include/cfitsio
