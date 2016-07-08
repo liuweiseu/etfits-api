@@ -97,7 +97,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
   /*status must be initialized to zero!*/
   int status = 0;
   int hdupos = 0, nkeys;
-  int flag = 0;
+  int header_flag = 0;
   int obs_flag = 0;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
@@ -124,11 +124,11 @@ int get_s6data(s6dataspec_t * s6dataspec)
       if (is_aoscram(fptr, &status, obs, &obs_flag) || 
           is_gbtstatus(fptr, &status, obs, &obs_flag))
       {
-        if (!flag) 
+        if (!header_flag) 
         {
           coarchid = get_coarchid(fptr, &status);
           clock_freq = get_clock_freq(fptr, &status);
-          flag = 1;
+          header_flag = 1;
         }
         if (strcmp(obs, "AO") == 0) 
         {
@@ -235,7 +235,7 @@ int get_s6ccpowers(s6dataspec_t * s6dataspec)
   /*status must be initialized to zero!*/
   int status = 0;
   int hdupos = 0, nkeys;
-  int flag = 0;
+  int header_flag = 0;
   int obs_flag = 0;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
@@ -264,11 +264,11 @@ int get_s6ccpowers(s6dataspec_t * s6dataspec)
       if (is_aoscram(fptr, &status, obs, &obs_flag) || 
           is_gbtstatus(fptr, &status, obs, &obs_flag))
       {
-        if (!flag) 
+        if (!header_flag) 
         {
           coarchid = get_coarchid(fptr, &status);
           clock_freq = get_clock_freq(fptr, &status);
-          flag = 1;
+          header_flag = 1;
         }
         /*if (strcmp(obs, "AO") == 0) 
         {
@@ -576,8 +576,15 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
 {
   //differing constant
   int32_t fc_per_cc;
-  if (strcmp(obs, "GBT") == 0) fc_per_cc = pow(2.0, 19); 
-  else if (strcmp(obs, "AO") == 0) fc_per_cc = pow(2.0, 17);
+  if (strcmp(obs, "GBT") == 0) 
+  {
+    fc_per_cc = pow(2.0, 19); 
+    clock_freq = clock_freq * 2;
+  }
+  else if (strcmp(obs, "AO") == 0) 
+  { 
+    fc_per_cc = pow(2.0, 17);
+  }
   int cc_per_sys = 4096;
   double band_width = clock_freq/2;
   double fc_bin_width = band_width/(cc_per_sys * fc_per_cc);
