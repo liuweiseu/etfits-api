@@ -13,11 +13,12 @@ typedef struct
   int bors;
   double ra;
   double dec;
-  int missedpk;
+  //int missedpk;
   double detected_power;
   double mean_power;
   int32_t fine_channel_bin;
   unsigned short coarse_channel_bin;
+  int user_flag;
   double ifreq;
   double rfreq;
 } s6hits_t;
@@ -60,6 +61,7 @@ typedef struct s6dataspec_t
   int sortby_rfreq;
   int sortby_time;
   int sortby_bors;
+  int total_missedpk;
   float threshold;
   std::vector<int> bors;
   //same as above but with channels

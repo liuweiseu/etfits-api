@@ -120,9 +120,6 @@ class s6hits_t(_object):
     __swig_setmethods__["dec"] = _s6fits.s6hits_t_dec_set
     __swig_getmethods__["dec"] = _s6fits.s6hits_t_dec_get
     if _newclass:dec = _swig_property(_s6fits.s6hits_t_dec_get, _s6fits.s6hits_t_dec_set)
-    __swig_setmethods__["missedpk"] = _s6fits.s6hits_t_missedpk_set
-    __swig_getmethods__["missedpk"] = _s6fits.s6hits_t_missedpk_get
-    if _newclass:missedpk = _swig_property(_s6fits.s6hits_t_missedpk_get, _s6fits.s6hits_t_missedpk_set)
     __swig_setmethods__["detected_power"] = _s6fits.s6hits_t_detected_power_set
     __swig_getmethods__["detected_power"] = _s6fits.s6hits_t_detected_power_get
     if _newclass:detected_power = _swig_property(_s6fits.s6hits_t_detected_power_get, _s6fits.s6hits_t_detected_power_set)
@@ -135,6 +132,9 @@ class s6hits_t(_object):
     __swig_setmethods__["coarse_channel_bin"] = _s6fits.s6hits_t_coarse_channel_bin_set
     __swig_getmethods__["coarse_channel_bin"] = _s6fits.s6hits_t_coarse_channel_bin_get
     if _newclass:coarse_channel_bin = _swig_property(_s6fits.s6hits_t_coarse_channel_bin_get, _s6fits.s6hits_t_coarse_channel_bin_set)
+    __swig_setmethods__["user_flag"] = _s6fits.s6hits_t_user_flag_set
+    __swig_getmethods__["user_flag"] = _s6fits.s6hits_t_user_flag_get
+    if _newclass:user_flag = _swig_property(_s6fits.s6hits_t_user_flag_get, _s6fits.s6hits_t_user_flag_set)
     __swig_setmethods__["ifreq"] = _s6fits.s6hits_t_ifreq_set
     __swig_getmethods__["ifreq"] = _s6fits.s6hits_t_ifreq_get
     if _newclass:ifreq = _swig_property(_s6fits.s6hits_t_ifreq_get, _s6fits.s6hits_t_ifreq_set)
@@ -255,6 +255,9 @@ class s6dataspec_t(_object):
     __swig_setmethods__["sortby_bors"] = _s6fits.s6dataspec_t_sortby_bors_set
     __swig_getmethods__["sortby_bors"] = _s6fits.s6dataspec_t_sortby_bors_get
     if _newclass:sortby_bors = _swig_property(_s6fits.s6dataspec_t_sortby_bors_get, _s6fits.s6dataspec_t_sortby_bors_set)
+    __swig_setmethods__["total_missedpk"] = _s6fits.s6dataspec_t_total_missedpk_set
+    __swig_getmethods__["total_missedpk"] = _s6fits.s6dataspec_t_total_missedpk_get
+    if _newclass:total_missedpk = _swig_property(_s6fits.s6dataspec_t_total_missedpk_get, _s6fits.s6dataspec_t_total_missedpk_set)
     __swig_setmethods__["threshold"] = _s6fits.s6dataspec_t_threshold_set
     __swig_getmethods__["threshold"] = _s6fits.s6dataspec_t_threshold_get
     if _newclass:threshold = _swig_property(_s6fits.s6dataspec_t_threshold_get, _s6fits.s6dataspec_t_threshold_set)

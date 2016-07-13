@@ -9,3 +9,6 @@ pyfits-3.3
 *.cpp
 listhead
 listhead.c
+*.a
+*.so
+*.o

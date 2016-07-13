@@ -6108,58 +6108,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_s6hits_t_missedpk_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  s6hits_t *arg1 = (s6hits_t *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_missedpk_set",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_missedpk_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
-  }
-  arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_missedpk_set" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
-  if (arg1) (arg1)->missedpk = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_s6hits_t_missedpk_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  s6hits_t *arg1 = (s6hits_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_missedpk_get",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_missedpk_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
-  }
-  arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  result = (int) ((arg1)->missedpk);
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_s6hits_t_detected_power_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *arg1 = (s6hits_t *) 0 ;
@@ -6370,6 +6318,58 @@ SWIGINTERN PyObject *_wrap_s6hits_t_coarse_channel_bin_get(PyObject *SWIGUNUSEDP
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
   result = (unsigned short) ((arg1)->coarse_channel_bin);
   resultobj = SWIG_From_unsigned_SS_short(static_cast< unsigned short >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6hits_t_user_flag_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6hits_t *arg1 = (s6hits_t *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_user_flag_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_user_flag_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6hits_t * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_user_flag_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  if (arg1) (arg1)->user_flag = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6hits_t_user_flag_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6hits_t *arg1 = (s6hits_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_user_flag_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_user_flag_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6hits_t * >(argp1);
+  result = (int) ((arg1)->user_flag);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -7801,6 +7801,58 @@ SWIGINTERN PyObject *_wrap_s6dataspec_t_sortby_bors_get(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
   result = (int) ((arg1)->sortby_bors);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6dataspec_t_total_missedpk_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6dataspec_t_total_missedpk_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_total_missedpk_set" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6dataspec_t_total_missedpk_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  if (arg1) (arg1)->total_missedpk = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s6dataspec_t_total_missedpk_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6dataspec_t_total_missedpk_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_total_missedpk_get" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
+  result = (int) ((arg1)->total_missedpk);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
@@ -12167,8 +12219,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6hits_t_ra_get", _wrap_s6hits_t_ra_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_dec_set", _wrap_s6hits_t_dec_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_dec_get", _wrap_s6hits_t_dec_get, METH_VARARGS, NULL},
-	 { (char *)"s6hits_t_missedpk_set", _wrap_s6hits_t_missedpk_set, METH_VARARGS, NULL},
-	 { (char *)"s6hits_t_missedpk_get", _wrap_s6hits_t_missedpk_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_detected_power_set", _wrap_s6hits_t_detected_power_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_detected_power_get", _wrap_s6hits_t_detected_power_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_mean_power_set", _wrap_s6hits_t_mean_power_set, METH_VARARGS, NULL},
@@ -12177,6 +12227,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6hits_t_fine_channel_bin_get", _wrap_s6hits_t_fine_channel_bin_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_coarse_channel_bin_set", _wrap_s6hits_t_coarse_channel_bin_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_coarse_channel_bin_get", _wrap_s6hits_t_coarse_channel_bin_get, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_user_flag_set", _wrap_s6hits_t_user_flag_set, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_user_flag_get", _wrap_s6hits_t_user_flag_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_ifreq_set", _wrap_s6hits_t_ifreq_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_ifreq_get", _wrap_s6hits_t_ifreq_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_rfreq_set", _wrap_s6hits_t_rfreq_set, METH_VARARGS, NULL},
@@ -12236,6 +12288,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6dataspec_t_sortby_time_get", _wrap_s6dataspec_t_sortby_time_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_sortby_bors_set", _wrap_s6dataspec_t_sortby_bors_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_sortby_bors_get", _wrap_s6dataspec_t_sortby_bors_get, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_total_missedpk_set", _wrap_s6dataspec_t_total_missedpk_set, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_total_missedpk_get", _wrap_s6dataspec_t_total_missedpk_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_threshold_set", _wrap_s6dataspec_t_threshold_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_threshold_get", _wrap_s6dataspec_t_threshold_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_bors_set", _wrap_s6dataspec_t_bors_set, METH_VARARGS, NULL},
