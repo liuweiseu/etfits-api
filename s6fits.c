@@ -597,7 +597,7 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   double resolution = fc_bin_width * 1000000;    
   double sys_cc = coarchid + cc;
   double sys_fc = fc_per_cc * sys_cc + signed_fc;
-  double ifreq = ((sys_fc + fc_per_cc) * resolution) / 1000000;   
+  double ifreq = (sys_fc * resolution) / 1000000;   
   return ifreq;
 }
 
