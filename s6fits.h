@@ -21,6 +21,7 @@ typedef struct
   int user_flag;
   double ifreq;
   double rfreq;
+  double rf_center;
 } s6hits_t;
 
 typedef struct
@@ -42,8 +43,8 @@ typedef struct
   double julian_date;
   time_t unix_time;
   double ra;
-  int bors;
   double dec;
+  int bors;
   int nhits;
   int missedpk;  
 } s6hitsheader_t;
@@ -61,8 +62,11 @@ typedef struct s6dataspec_t
   int sortby_rfreq;
   int sortby_time;
   int sortby_bors;
+  int filterby_rf_center_mode;
+  double filter_percent;
   int total_missedpk;
   float threshold;
+  float rf_center_mode;
   std::vector<int> bors;
   //same as above but with channels
   std::vector<int> channels;

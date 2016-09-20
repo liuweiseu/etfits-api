@@ -45,11 +45,9 @@ void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb);
 double calc_ifreq(double clock_freq, int coarchid, char * obs,  
                   int32_t signed_fc, unsigned short cc);
 
-double calc_ao_rfreq(char * telescope, double if1synhz, 
-                  double if2synhz, double ifreq);
+double calc_ao_rfreq(double ifreq, double rf_center, double if2synhz, char * telescope);
 
-double calc_gbt_rfreq(double ifreq, double ifv1csfq, 
-                      double ifv1iffq, char * ifv1ssb);
+double calc_gbt_rfreq(double ifreq, double rf_center, double ifv1iffq, char * ifv1ssb);
 
 int is_aoscram(fitsfile * fptr, int * status, 
                char * obs, int * obs_flag);
@@ -69,6 +67,8 @@ double get_julian_from_unix (int unix_time);
 
 int find (int val, std::vector<int> vec);
 
+void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_center_vec);
+
 void sort_bors(std::vector<s6hits_t> s6hits);
 
 void sort_time(std::vector<s6hits_t> s6hits);
@@ -86,6 +86,25 @@ bool cmpifreq(const s6hits_t &lhs, const s6hits_t &rhs);
 bool cmprfreq(const s6hits_t &lhs, const s6hits_t &rhs);
 
 void sort(s6dataspec_t * s6dataspec);
+
+// represents an array of booleans
+static char _bits[8] = {1, 2, 4, 8, 16, 32, 64, 128};
+struct BITMAP {
+    char* data;
+    static inline long get_size(long n) {
+        return (n+7)/8;
+    }
+    void init(char* d) {
+        data = d;
+    }
+    int write_file(const char* filename, long nbits);
+    inline void set(long i) {
+        data[i/8] |= _bits[i%8];
+    }
+    inline int get(long i) {
+        return data[i/8]&_bits[i%8];
+    }
+};
 
 /*get_s6data will populate a s6hits_t data type according to the data specs
  * given by the user in the s6dataspec argument. For more details please see
@@ -108,6 +127,9 @@ int get_s6data(s6dataspec_t * s6dataspec)
   double if2synhz, if1synhz;
   double ifv1iffq, ifv1csfq;
   char ifv1ssb[FLEN_VALUE];
+  double rf_center;
+  std::vector<double> rf_center_vec;
+
   if (!fits_open_file(&fptr, filename, READONLY, &status))
   {
     //fits_get_hdu_num(fptr, &hdupos); 
@@ -131,20 +153,32 @@ int get_s6data(s6dataspec_t * s6dataspec)
           clock_freq = get_clock_freq(fptr, &status);
           header_flag = 1;
         }
+		//get LO settings for RF calculation
         if (strcmp(obs, "AO") == 0) 
         {
-          if (strcmp(telescope, "AO_327MHz") == 0)
-          {
-            if2synhz = get_if2synhz(fptr, &status);
-          }
-          if1synhz = get_if1synhz(fptr, &status); 
+          if1synhz = get_if1synhz(fptr, &status);	// need for both ALFA and 327MHz 
+          if2synhz = get_if2synhz(fptr, &status);	// just need for 327MHz
+		  rf_center = if1synhz / 1000000;
+          //if (strcmp(telescope, "AO_327MHz") == 0)
+          // {
+          //		rf_center = (if1synhz / 1000000) - (if2synhz / 1000000);
+          //     } else {		// assume ALFA
+	      //	  }
         }
         else if (strcmp(obs, "GBT") == 0) 
         {
           get_ifv1ssb(fptr, &status, ifv1ssb);
           ifv1iffq = get_ifv1iffq(fptr, &status);
-          ifv1csfq = get_ifv1csfq(fptr, &status); 
+          rf_center = get_ifv1csfq(fptr, &status); 
         }
+//s6dataspec->filterby_rf_center_mode = 1;		// for testing
+//fprintf(stderr, "filterby_rf_center_mode %d\n", s6dataspec->filterby_rf_center_mode);
+//fprintf(stderr, "rf_center %lf\n", rf_center);
+  		if(s6dataspec->filterby_rf_center_mode && rf_center >= 0) 
+		{
+		  rf_center_vec.push_back(rf_center);
+  		}
+		//end get LO settings for RF calculation
       }
       /* calculated and saved before we make the hit to save us the hassle of
  * grabbing it for each new hit in the binary table*/
@@ -203,13 +237,14 @@ int get_s6data(s6dataspec_t * s6dataspec)
             hit.coarse_channel_bin = coarch_array[i];
             hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
                                    signed_fc, coarch_array[i]);
+  			//hit.rfreq = rf_center >= 0 ? rf_center - hit.ifreq : -1;	// an rf_center of -1 indicates a header error
+			hit.rf_center = rf_center;
             if (strcmp(obs, "AO") == 0) 
-              hit.rfreq = calc_ao_rfreq(telescope, if1synhz, 
-                                        if2synhz, hit.ifreq);
+              	hit.rfreq = calc_ao_rfreq(hit.ifreq, rf_center, if2synhz, telescope);
             else if (strcmp(obs, "GBT") == 0) 
-              hit.rfreq = calc_gbt_rfreq(hit.ifreq, ifv1csfq, 
-                                         ifv1iffq, ifv1ssb);
-            else hit.rfreq = -1;
+              	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_center, ifv1iffq, ifv1ssb);
+            else 
+				hit.rfreq = -1;
             s6dataspec->s6hits.push_back(hit);
           }
         } 
@@ -230,6 +265,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
 
   if (status > 0) s6dataspec->errorcode += 1;
 
+  filter(s6dataspec, rf_center_vec);
   sort(s6dataspec);
   
   return (status);
@@ -602,26 +638,26 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
 }
 
 /*calculates sky frequency for AO*/
-double calc_ao_rfreq(char * telescope, double if1synhz, 
-                  double if2synhz, double ifreq)
+double calc_ao_rfreq(double ifreq, double rf_center, double if2synhz, char * telescope)
+//double calc_ao_rfreq(char * telescope, double if1synhz, 
+//                  double if2synhz, double ifreq)
 {
   double rf;
   if (strcmp(telescope, "AO_ALFA") == 0)
-    rf = (if1synhz / 1000000) - ifreq;
+  	rf = rf_center >= 0 ? rf_center - ifreq : -1;
   else if (strcmp(telescope, "AO_327MHz") == 0)
-    rf = (if1synhz / 1000000) - ((if2synhz / 1000000) - ifreq);
-  else rf = -1;
-  return rf;
+	rf = rf_center >= 0 ? rf_center - ((if2synhz / 1000000) - ifreq) : -1;
+  return rf;	// -1 indicates an error
 }
 
-double calc_gbt_rfreq(double ifreq, double ifv1csfq, 
+double calc_gbt_rfreq(double ifreq, double rf_center, 
                       double ifv1iffq, char * ifv1ssb) 
 {
   double rf;
   if (strcmp(ifv1ssb, "upper") == 0)
-    rf = ifv1csfq + (ifreq - ifv1iffq);
+    rf = rf_center + (ifreq - ifv1iffq);
   else if (strcmp(ifv1ssb, "lower") == 0)
-    rf = ifv1csfq - (ifreq - ifv1iffq); 
+    rf = rf_center - (ifreq - ifv1iffq); 
   else 
     rf = -1;
   return rf;
@@ -713,6 +749,63 @@ int find (int val, std::vector<int> vec)
     if (val == * it) return 1;
   }
   return 0;
+}
+
+void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_center_vec) {
+
+	double rf_center_mode, rf_center_mode_test;
+	unsigned long mode_count=1, mode_count_test=1;
+	unsigned long i;
+
+	BITMAP hit_filter;		// will be used by all filters
+
+	if(!s6dataspec->filterby_rf_center_mode) return;
+//fprintf(stderr, "finding mode : size of hits is %ld bitmap is %ld bytes long\n", s6dataspec->s6hits.size(), hit_filter.get_size(s6dataspec->s6hits.size()));
+    hit_filter.init((char*)calloc(1, BITMAP::get_size(s6dataspec->s6hits.size())));
+//fprintf(stderr, "bitmap is %ld bytes long\n", hit_filter.data.size());
+
+	// start rf center mode filter
+	std::sort(rf_center_vec.begin(), rf_center_vec.end());
+	rf_center_mode_test = rf_center_vec.at(1);
+	for(i=1; i < rf_center_vec.size(); i++) {
+		if (rf_center_vec[i] == rf_center_mode_test) {
+			mode_count_test++;
+		} else {
+			if(mode_count_test > mode_count) { 	// we have a better mode
+				mode_count 			= mode_count_test;			
+				rf_center_mode 		= rf_center_vec[i-1];
+				rf_center_mode_test = rf_center_vec[i];
+//fprintf(stderr, "mode = %lf count = %ld\n", rf_center_mode, mode_count);
+			}
+				mode_count_test = 1;
+		}
+	}
+	if(mode_count_test > mode_count) {		// catch final rf_center_vec[]
+		rf_center_mode = rf_center_vec[i-1];
+	}
+	s6dataspec->rf_center_mode = rf_center_mode;
+//fprintf(stderr, "final mode = %lf (%lf) count = %ld\n", rf_center_mode, rf_center_vec[i-1], mode_count_test);
+	// now go through s6dataspec.s6hits, filtering any element with rf_center != mode
+	for(unsigned long i=1; i < s6dataspec->s6hits.size(); i++) {
+		if(s6dataspec->s6hits[i].rf_center != rf_center_mode) {
+			hit_filter.set(i);
+		}
+	}
+	// end rf center mode filter
+
+	// Additional filters (with bit map setting) go here...
+	
+	
+	// filtering complete, now copy any element not filtered to new vector
+	std::vector<s6hits_t> filtered_hits;
+	for(unsigned long i=1; i < s6dataspec->s6hits.size(); i++) {
+		if(hit_filter.get(i) == 0) {		// this hit OK, ie not filtered
+			filtered_hits.push_back(s6dataspec->s6hits[i]);
+		}
+	}
+			
+	// swap non-filtered for filtered
+	s6dataspec->s6hits.swap(filtered_hits);
 }
 
 void sort(s6dataspec_t * s6dataspec)
@@ -870,28 +963,30 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
   printf("%15s", "Unix Time");
   printf("%20s", "Julian Date");
   printf("%10s", "RA");
-  printf("%10s", "BorS");
   printf("%15s", "DEC");
+  printf("%10s", "BorS");
   printf("%20s", "DETPOW");
   printf("%20s", "MEANPOW");
   printf("%13s", "FINECHAN");
   printf("%10s", "COARCHAN"); 
   printf("%15s", "ifreq");
-  printf("%15s\n", "rfreq");
+  printf("%15s", "rfreq");
+  printf("%15s\n", "rf_center");
   for (std::vector<s6hits_t>::iterator hit = s6hits.begin() ; 
          hit != s6hits.end(); ++hit)
   {
     printf("%15d", (int) hit->unix_time);
     printf("%20f", hit->julian_date);
     printf("%10g", hit->ra);
-    printf("%10d", hit->bors);
     printf("%15g", hit->dec);
+    printf("%10d", hit->bors);
     printf("%20f", hit->detected_power);
     printf("%20f", hit->mean_power);
     printf("%13d", (int)  hit->fine_channel_bin);
     printf("%10hu", hit->coarse_channel_bin);
     printf("%15f", hit->ifreq); 
-    printf("%15f\n", hit->rfreq); 
+    printf("%15f", hit->rfreq); 
+    printf("%15f\n", hit->rf_center); 
   }
 }
 

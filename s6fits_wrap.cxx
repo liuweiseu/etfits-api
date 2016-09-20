@@ -6480,6 +6480,63 @@ fail:
 }
 
 
+
+SWIGINTERN PyObject *_wrap_s6hits_t_rf_center_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6hits_t *arg1 = (s6hits_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_rf_center_get",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_rf_center_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6hits_t * >(argp1);
+  result = (double) ((arg1)->rf_center);
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+SWIGINTERN PyObject *_wrap_s6hits_t_rf_center_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  s6hits_t *arg1 = (s6hits_t *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_rf_center_set",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_rf_center_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
+  }
+  arg1 = reinterpret_cast< s6hits_t * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_rf_center_set" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  if (arg1) (arg1)->rf_center = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+
+
+
+
+
 SWIGINTERN PyObject *_wrap_new_s6hits_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *result = 0 ;
@@ -12233,6 +12290,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6hits_t_ifreq_get", _wrap_s6hits_t_ifreq_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_rfreq_set", _wrap_s6hits_t_rfreq_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_rfreq_get", _wrap_s6hits_t_rfreq_get, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_rf_center_get", _wrap_s6hits_t_rf_center_get, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_rf_center_set", _wrap_s6hits_t_rf_center_set, METH_VARARGS, NULL},
 	 { (char *)"new_s6hits_t", _wrap_new_s6hits_t, METH_VARARGS, NULL},
 	 { (char *)"delete_s6hits_t", _wrap_delete_s6hits_t, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_swigregister", s6hits_t_swigregister, METH_VARARGS, NULL},

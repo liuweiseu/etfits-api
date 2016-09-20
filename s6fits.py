@@ -141,6 +141,9 @@ class s6hits_t(_object):
     __swig_setmethods__["rfreq"] = _s6fits.s6hits_t_rfreq_set
     __swig_getmethods__["rfreq"] = _s6fits.s6hits_t_rfreq_get
     if _newclass:rfreq = _swig_property(_s6fits.s6hits_t_rfreq_get, _s6fits.s6hits_t_rfreq_set)
+    __swig_setmethods__["rf_center"] = _s6fits.s6hits_t_rf_center_set
+    __swig_getmethods__["rf_center"] = _s6fits.s6hits_t_rf_center_get
+    if _newclass:rf_center = _swig_property(_s6fits.s6hits_t_rf_center_get, _s6fits.s6hits_t_rf_center_set)
     def __init__(self): 
         this = _s6fits.new_s6hits_t()
         try: self.this.append(this)
