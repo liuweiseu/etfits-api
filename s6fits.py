@@ -258,6 +258,9 @@ class s6dataspec_t(_object):
     __swig_setmethods__["sortby_bors"] = _s6fits.s6dataspec_t_sortby_bors_set
     __swig_getmethods__["sortby_bors"] = _s6fits.s6dataspec_t_sortby_bors_get
     if _newclass:sortby_bors = _swig_property(_s6fits.s6dataspec_t_sortby_bors_get, _s6fits.s6dataspec_t_sortby_bors_set)
+    __swig_setmethods__["filterby_rf_center_mode"] = _s6fits.s6dataspec_t_filterby_rf_center_mode_set
+    __swig_getmethods__["filterby_rf_center_mode"] = _s6fits.s6dataspec_t_filterby_rf_center_mode_get
+    if _newclass:filterby_rf_center_mode = _swig_property(_s6fits.s6dataspec_t_filterby_rf_center_mode_get, _s6fits.s6dataspec_t_filterby_rf_center_mode_set)
     __swig_setmethods__["total_missedpk"] = _s6fits.s6dataspec_t_total_missedpk_set
     __swig_getmethods__["total_missedpk"] = _s6fits.s6dataspec_t_total_missedpk_get
     if _newclass:total_missedpk = _swig_property(_s6fits.s6dataspec_t_total_missedpk_get, _s6fits.s6dataspec_t_total_missedpk_set)
