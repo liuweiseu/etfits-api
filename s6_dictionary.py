@@ -149,7 +149,7 @@ def main():
   dataspec.sortby_time = 0
   dataspec.sortby_ifreq = 0
   dataspec.sortby_rfreq = 0
-  dataspec.filterby_rf_center_mode = 0
+  dataspec.filterby_rf_reference_mode = 1
   """
   get_s6data() will either create a new s6fits vector, or if your dataspec
   includes a vector, it will add hits to it. Right now we have no vector of hits

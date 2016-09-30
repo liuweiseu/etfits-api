@@ -141,9 +141,9 @@ class s6hits_t(_object):
     __swig_setmethods__["rfreq"] = _s6fits.s6hits_t_rfreq_set
     __swig_getmethods__["rfreq"] = _s6fits.s6hits_t_rfreq_get
     if _newclass:rfreq = _swig_property(_s6fits.s6hits_t_rfreq_get, _s6fits.s6hits_t_rfreq_set)
-    __swig_setmethods__["rf_center"] = _s6fits.s6hits_t_rf_center_set
-    __swig_getmethods__["rf_center"] = _s6fits.s6hits_t_rf_center_get
-    if _newclass:rf_center = _swig_property(_s6fits.s6hits_t_rf_center_get, _s6fits.s6hits_t_rf_center_set)
+    __swig_setmethods__["rf_reference"] = _s6fits.s6hits_t_rf_reference_set
+    __swig_getmethods__["rf_reference"] = _s6fits.s6hits_t_rf_reference_get
+    if _newclass:rf_reference = _swig_property(_s6fits.s6hits_t_rf_reference_get, _s6fits.s6hits_t_rf_reference_set)
     def __init__(self): 
         this = _s6fits.new_s6hits_t()
         try: self.this.append(this)
@@ -258,9 +258,9 @@ class s6dataspec_t(_object):
     __swig_setmethods__["sortby_bors"] = _s6fits.s6dataspec_t_sortby_bors_set
     __swig_getmethods__["sortby_bors"] = _s6fits.s6dataspec_t_sortby_bors_get
     if _newclass:sortby_bors = _swig_property(_s6fits.s6dataspec_t_sortby_bors_get, _s6fits.s6dataspec_t_sortby_bors_set)
-    __swig_setmethods__["filterby_rf_center_mode"] = _s6fits.s6dataspec_t_filterby_rf_center_mode_set
-    __swig_getmethods__["filterby_rf_center_mode"] = _s6fits.s6dataspec_t_filterby_rf_center_mode_get
-    if _newclass:filterby_rf_center_mode = _swig_property(_s6fits.s6dataspec_t_filterby_rf_center_mode_get, _s6fits.s6dataspec_t_filterby_rf_center_mode_set)
+    __swig_setmethods__["filterby_rf_reference_mode"] = _s6fits.s6dataspec_t_filterby_rf_reference_mode_set
+    __swig_getmethods__["filterby_rf_reference_mode"] = _s6fits.s6dataspec_t_filterby_rf_reference_mode_get
+    if _newclass:filterby_rf_reference_mode = _swig_property(_s6fits.s6dataspec_t_filterby_rf_reference_mode_get, _s6fits.s6dataspec_t_filterby_rf_reference_mode_set)
     __swig_setmethods__["total_missedpk"] = _s6fits.s6dataspec_t_total_missedpk_set
     __swig_getmethods__["total_missedpk"] = _s6fits.s6dataspec_t_total_missedpk_get
     if _newclass:total_missedpk = _swig_property(_s6fits.s6dataspec_t_total_missedpk_get, _s6fits.s6dataspec_t_total_missedpk_set)

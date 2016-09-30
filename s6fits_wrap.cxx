@@ -6481,7 +6481,7 @@ fail:
 
 
 
-SWIGINTERN PyObject *_wrap_s6hits_t_rf_center_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_s6hits_t_rf_reference_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *arg1 = (s6hits_t *) 0 ;
   void *argp1 = 0 ;
@@ -6489,20 +6489,20 @@ SWIGINTERN PyObject *_wrap_s6hits_t_rf_center_get(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   double result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_rf_center_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:s6hits_t_rf_reference_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_rf_center_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_rf_reference_get" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
-  result = (double) ((arg1)->rf_center);
+  result = (double) ((arg1)->rf_reference);
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
   return NULL;
 }
 
-SWIGINTERN PyObject *_wrap_s6hits_t_rf_center_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_s6hits_t_rf_reference_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6hits_t *arg1 = (s6hits_t *) 0 ;
   double arg2 ;
@@ -6513,18 +6513,18 @@ SWIGINTERN PyObject *_wrap_s6hits_t_rf_center_set(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_rf_center_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6hits_t_rf_reference_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6hits_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_rf_center_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6hits_t_rf_reference_set" "', argument " "1"" of type '" "s6hits_t *""'"); 
   }
   arg1 = reinterpret_cast< s6hits_t * >(argp1);
   ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_rf_center_set" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6hits_t_rf_reference_set" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = static_cast< double >(val2);
-  if (arg1) (arg1)->rf_center = arg2;
+  if (arg1) (arg1)->rf_reference = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7865,7 +7865,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_s6dataspec_t_filterby_rf_center_mode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_s6dataspec_t_filterby_rf_reference_mode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
   int arg2 ;
@@ -7876,18 +7876,18 @@ SWIGINTERN PyObject *_wrap_s6dataspec_t_filterby_rf_center_mode_set(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:s6dataspec_t_filterby_rf_center_mode_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:s6dataspec_t_filterby_rf_reference_mode_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_filterby_rf_center_mode_set" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_filterby_rf_reference_mode_set" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
   }
   arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6dataspec_t_filterby_rf_center_mode_set" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "s6dataspec_t_filterby_rf_reference_mode_set" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  if (arg1) (arg1)->filterby_rf_center_mode = arg2;
+  if (arg1) (arg1)->filterby_rf_reference_mode = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7895,7 +7895,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_s6dataspec_t_filterby_rf_center_mode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_s6dataspec_t_filterby_rf_reference_mode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   s6dataspec_t *arg1 = (s6dataspec_t *) 0 ;
   void *argp1 = 0 ;
@@ -7903,13 +7903,13 @@ SWIGINTERN PyObject *_wrap_s6dataspec_t_filterby_rf_center_mode_get(PyObject *SW
   PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:s6dataspec_t_filterby_rf_center_mode_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:s6dataspec_t_filterby_rf_reference_mode_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_s6dataspec_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_filterby_rf_center_mode_get" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s6dataspec_t_filterby_rf_reference_mode_get" "', argument " "1"" of type '" "s6dataspec_t *""'"); 
   }
   arg1 = reinterpret_cast< s6dataspec_t * >(argp1);
-  result = (int) ((arg1)->filterby_rf_center_mode);
+  result = (int) ((arg1)->filterby_rf_reference_mode);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
@@ -12342,8 +12342,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6hits_t_ifreq_get", _wrap_s6hits_t_ifreq_get, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_rfreq_set", _wrap_s6hits_t_rfreq_set, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_rfreq_get", _wrap_s6hits_t_rfreq_get, METH_VARARGS, NULL},
-	 { (char *)"s6hits_t_rf_center_get", _wrap_s6hits_t_rf_center_get, METH_VARARGS, NULL},
-	 { (char *)"s6hits_t_rf_center_set", _wrap_s6hits_t_rf_center_set, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_rf_reference_get", _wrap_s6hits_t_rf_reference_get, METH_VARARGS, NULL},
+	 { (char *)"s6hits_t_rf_reference_set", _wrap_s6hits_t_rf_reference_set, METH_VARARGS, NULL},
 	 { (char *)"new_s6hits_t", _wrap_new_s6hits_t, METH_VARARGS, NULL},
 	 { (char *)"delete_s6hits_t", _wrap_delete_s6hits_t, METH_VARARGS, NULL},
 	 { (char *)"s6hits_t_swigregister", s6hits_t_swigregister, METH_VARARGS, NULL},
@@ -12399,8 +12399,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s6dataspec_t_sortby_time_get", _wrap_s6dataspec_t_sortby_time_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_sortby_bors_set", _wrap_s6dataspec_t_sortby_bors_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_sortby_bors_get", _wrap_s6dataspec_t_sortby_bors_get, METH_VARARGS, NULL},
-	 { (char *)"s6dataspec_t_filterby_rf_center_mode_set", _wrap_s6dataspec_t_filterby_rf_center_mode_set, METH_VARARGS, NULL},
-	 { (char *)"s6dataspec_t_filterby_rf_center_mode_get", _wrap_s6dataspec_t_filterby_rf_center_mode_get, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_filterby_rf_reference_mode_set", _wrap_s6dataspec_t_filterby_rf_reference_mode_set, METH_VARARGS, NULL},
+	 { (char *)"s6dataspec_t_filterby_rf_reference_mode_get", _wrap_s6dataspec_t_filterby_rf_reference_mode_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_total_missedpk_set", _wrap_s6dataspec_t_total_missedpk_set, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_total_missedpk_get", _wrap_s6dataspec_t_total_missedpk_get, METH_VARARGS, NULL},
 	 { (char *)"s6dataspec_t_threshold_set", _wrap_s6dataspec_t_threshold_set, METH_VARARGS, NULL},
