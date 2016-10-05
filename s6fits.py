@@ -120,6 +120,9 @@ class s6hits_t(_object):
     __swig_setmethods__["dec"] = _s6fits.s6hits_t_dec_set
     __swig_getmethods__["dec"] = _s6fits.s6hits_t_dec_get
     if _newclass:dec = _swig_property(_s6fits.s6hits_t_dec_get, _s6fits.s6hits_t_dec_set)
+    __swig_setmethods__["missedpk"] = _s6fits.s6hits_t_missedpk_set
+    __swig_getmethods__["missedpk"] = _s6fits.s6hits_t_missedpk_get
+    if _newclass:missedpk = _swig_property(_s6fits.s6hits_t_missedpk_get, _s6fits.s6hits_t_missedpk_set)
     __swig_setmethods__["detected_power"] = _s6fits.s6hits_t_detected_power_set
     __swig_getmethods__["detected_power"] = _s6fits.s6hits_t_detected_power_get
     if _newclass:detected_power = _swig_property(_s6fits.s6hits_t_detected_power_get, _s6fits.s6hits_t_detected_power_set)

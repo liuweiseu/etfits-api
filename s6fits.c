@@ -229,6 +229,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
               hit.ra = ra;
             hit.bors = bors;
             hit.dec = dec;
+            hit.missedpk = missedpk;
             hit.user_flag = -1;
             hit.detected_power = detpow_array[i];
             hit.mean_power = meanpow_array[i];
@@ -946,6 +947,7 @@ void print_hits_structure (std::vector<s6hits_t> s6hits)
       printf("RA: %g\n", hit->ra);
       printf("beampol: %d\n", hit->bors);
       printf("dec: %g\n", hit->dec);
+      printf("missedpk: %d\n", hit->missedpk);
       /*binary table data*/
       printf("detected power: %f\n", hit->detected_power);
       printf("mean power: %f\n", hit->mean_power);
@@ -965,6 +967,7 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
   printf("%10s", "RA");
   printf("%15s", "DEC");
   printf("%10s", "BorS");
+  printf("%10s", "MSDPK");
   printf("%20s", "DETPOW");
   printf("%20s", "MEANPOW");
   printf("%13s", "FINECHAN");
@@ -980,6 +983,7 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%10g", hit->ra);
     printf("%15g", hit->dec);
     printf("%10d", hit->bors);
+    printf("%10d", hit->missedpk);
     printf("%20f", hit->detected_power);
     printf("%20f", hit->mean_power);
     printf("%13d", (int)  hit->fine_channel_bin);
@@ -1021,6 +1025,7 @@ void print_hits_header_table (std::vector<s6hitsheader_t> s6hitsheaders)
   printf("%10s", "BorS");
   printf("%10s", "NHITS");
   printf("%15s", "DEC");
+  printf("%10s\n", "MSDPK");
   for (std::vector<s6hitsheader_t>::iterator header = s6hitsheaders.begin() ; 
          header != s6hitsheaders.end(); ++header)
   {
