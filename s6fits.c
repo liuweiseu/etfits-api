@@ -139,6 +139,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
       if (hdupos == 0)
       {
         get_telescope(fptr, &status, telescope);
+		strncpy(s6dataspec->telescope, telescope, FLEN_VALUE);
         s6dataspec->threshold = get_threshold(fptr, &status);
       }
       //checks if the header we're looking at correspond to aoscram or gbt, and

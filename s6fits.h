@@ -2,9 +2,11 @@
 #define S6FITS_H_INCLUDED
 
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <vector>
 #include <stdint.h>
+#include "fitsio.h"
 
 typedef struct 
 {
@@ -52,6 +54,7 @@ typedef struct
 typedef struct s6dataspec_t
 {
   char * filename;
+  char telescope[FLEN_VALUE];
   //vector where hits requested will be added onto.
   std::vector<s6hits_t> s6hits;
   std::vector<s6ccpowers_t> s6ccpowers;
