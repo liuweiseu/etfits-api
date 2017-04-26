@@ -49,6 +49,8 @@ double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * 
 
 double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char * ifv1ssb);
 
+int is_good_data_gb(double ifv1iffq, double rf_reference);
+
 int is_aoscram(fitsfile * fptr, int * status, 
                char * obs, int * obs_flag);
 
@@ -118,6 +120,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
   int hdupos = 0, nkeys;
   int header_flag = 0;
   int obs_flag = 0;
+  int good_data = 0;
   int total_missedpk;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
@@ -132,6 +135,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
 
   if (!fits_open_file(&fptr, filename, READONLY, &status))
   {
+	// TODO factor out header logic
     //fits_get_hdu_num(fptr, &hdupos); 
     for (; !status; hdupos++) 
     {
@@ -165,12 +169,14 @@ int get_s6data(s6dataspec_t * s6dataspec)
           //		rf_reference = (if1synhz / 1000000) - (if2synhz / 1000000);
           //     } else {		// assume ALFA
 	      //	  }
+	      good_data = 1;	// TODO is assuming good data a good idea for AO?
         }
         else if (strcmp(obs, "GBT") == 0) 
         {
           get_ifv1ssb(fptr, &status, ifv1ssb);
           ifv1iffq = get_ifv1iffq(fptr, &status);
           rf_reference = get_ifv1csfq(fptr, &status); 
+		  good_data = is_good_data_gb(ifv1iffq, rf_reference);
         }
 //s6dataspec->filterby_rf_reference_mode = 1;		// for testing
 //fprintf(stderr, "filterby_rf_reference_mode %d\n", s6dataspec->filterby_rf_reference_mode);
@@ -192,8 +198,10 @@ int get_s6data(s6dataspec_t * s6dataspec)
         total_missedpk += missedpk;
       }
       int nhits = get_nhits(fptr, &status);
-      if (is_ethits(fptr, &status) && nhits > 0 
-          && is_desired_bors(bors, s6dataspec->bors))
+      if (is_ethits(fptr, &status) 					&& 
+		  nhits > 0 								&& 
+		  is_desired_bors(bors, s6dataspec->bors)	&&
+		  good_data)
       {
         int ncols, anynul;
         long nrows; 
@@ -663,6 +671,18 @@ double calc_gbt_rfreq(double ifreq, double rf_reference,
   else 
     rf = -1;
   return rf;
+}
+
+int is_good_data_gb(double ifv1iffq, double rf_reference) {
+
+	int rv = 1;		// assume good until proven bad
+	
+	// if either of these is zero, there was not a usable 
+	// signal at acquisition time
+	if(ifv1iffq == 0) 		rv = 0;
+	if(rf_reference == 0) 	rv = 0;
+
+	return(rv);
 }
 
 int is_aoscram (fitsfile * fptr, int * status, char * obs, int * obs_flag)

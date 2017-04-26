@@ -9,6 +9,7 @@
 #include "fitsio.h"
 
 typedef struct 
+// TODO add alfa filter bool?
 {
   double julian_date;
   time_t unix_time;
@@ -27,6 +28,7 @@ typedef struct
 } s6hits_t;
 
 typedef struct
+// TODO add alfa filter bool?
 {
   double julian_date;
   time_t unix_time;
