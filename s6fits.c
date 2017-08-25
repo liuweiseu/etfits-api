@@ -42,6 +42,10 @@ double get_ifv1iffq (fitsfile * fptr, int * status);
 
 void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb);
 
+double get_bammpwr1 (fitsfile * fptr, int * status);
+
+double get_bammpwr2 (fitsfile * fptr, int * status);
+
 double calc_ifreq(double clock_freq, int coarchid, char * obs,  
                   int32_t signed_fc, unsigned short cc);
 
@@ -49,7 +53,7 @@ double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * 
 
 double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char * ifv1ssb);
 
-int is_good_data_gb(double ifv1iffq, double rf_reference);
+int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, double bammpwr2);
 
 int is_aoscram(fitsfile * fptr, int * status, 
                char * obs, int * obs_flag);
@@ -118,6 +122,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
   /*status must be initialized to zero!*/
   int status = 0;
   int hdupos = 0, nkeys;
+  int testmode = 0;
   int header_flag = 0;
   int obs_flag = 0;
   int good_data = 0;
@@ -128,9 +133,10 @@ int get_s6data(s6dataspec_t * s6dataspec)
   char telescope[FLEN_VALUE];
   char obs[10];
   double if2synhz, if1synhz;
-  double ifv1iffq, ifv1csfq;
+  double ifv1iffq;
   char ifv1ssb[FLEN_VALUE];
   double rf_reference;
+  double bammpwr1, bammpwr2;
   std::vector<double> rf_reference_vec;
 
   if (!fits_open_file(&fptr, filename, READONLY, &status))
@@ -139,10 +145,13 @@ int get_s6data(s6dataspec_t * s6dataspec)
     //fits_get_hdu_num(fptr, &hdupos); 
     for (; !status; hdupos++) 
     {
+//==========================================================
       //primary header
       if (hdupos == 0)
       {
+// TODO process_primary() ==========================================================
         get_telescope(fptr, &status, telescope);
+		if(strcmp(telescope, "S6TEST") == 0) testmode = 1;
 		strncpy(s6dataspec->telescope, telescope, FLEN_VALUE);
         s6dataspec->threshold = get_threshold(fptr, &status);
       }
@@ -152,6 +161,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
       if (is_aoscram(fptr, &status, obs, &obs_flag) || 
           is_gbtstatus(fptr, &status, obs, &obs_flag))
       {
+// TODO process_meta_data() ==========================================================
         if (!header_flag) 
         {
           coarchid = get_coarchid(fptr, &status);
@@ -173,10 +183,17 @@ int get_s6data(s6dataspec_t * s6dataspec)
         }
         else if (strcmp(obs, "GBT") == 0) 
         {
-          get_ifv1ssb(fptr, &status, ifv1ssb);
-          ifv1iffq = get_ifv1iffq(fptr, &status);
-          rf_reference = get_ifv1csfq(fptr, &status); 
-		  good_data = is_good_data_gb(ifv1iffq, rf_reference);
+		  if(testmode) 
+		  {
+			good_data = 1;		// data are always good in test mode!
+		  } else {
+          	get_ifv1ssb(fptr, &status, ifv1ssb);
+          	ifv1iffq = get_ifv1iffq(fptr, &status);
+          	rf_reference = get_ifv1csfq(fptr, &status); 
+			bammpwr1 = get_bammpwr1(fptr, &status);
+			bammpwr2 = get_bammpwr2(fptr, &status);
+		  	good_data = is_good_data_gb(ifv1iffq, rf_reference, bammpwr1, bammpwr2);
+		  }
         }
 //s6dataspec->filterby_rf_reference_mode = 1;		// for testing
 //fprintf(stderr, "filterby_rf_reference_mode %d\n", s6dataspec->filterby_rf_reference_mode);
@@ -187,8 +204,9 @@ int get_s6data(s6dataspec_t * s6dataspec)
   		}
 		//end get LO settings for RF calculation
       }
+// TODO at hits header at this point
       /* calculated and saved before we make the hit to save us the hassle of
- * grabbing it for each new hit in the binary table*/
+ * grabbing it for each new hit in the binary table. TODO WAIT - each beam has diff coords*/
       time_t time = get_time(fptr, &status);
       double ra = get_RA(fptr, &status);
       int bors = get_bors(fptr, obs, &status);
@@ -198,11 +216,13 @@ int get_s6data(s6dataspec_t * s6dataspec)
         total_missedpk += missedpk;
       }
       int nhits = get_nhits(fptr, &status);
+//fprintf(stderr, "nhits = %d bors %d good_data %d is_desired_bors = %d\n", nhits, bors, good_data, is_desired_bors(bors, s6dataspec->bors));
       if (is_ethits(fptr, &status) 					&& 
 		  nhits > 0 								&& 
 		  is_desired_bors(bors, s6dataspec->bors)	&&
 		  good_data)
       {
+// TODO process_hits() ==========================================================
         int ncols, anynul;
         long nrows; 
 
@@ -227,8 +247,10 @@ int get_s6data(s6dataspec_t * s6dataspec)
 
         for (int i = 0; i < nhits; i++) 
         {
+//fprintf(stderr, "CC %d\n", coarch_array[i]);
           if (is_desired_coarchan(coarch_array[i], s6dataspec->channels))
           {
+//fprintf(stderr, "getting hits\n");
             s6hits_t hit;
             hit.unix_time = time;
             hit.julian_date = get_julian_from_unix((int) time);
@@ -255,6 +277,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
               	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
             else 
 				hit.rfreq = -1;
+//fprintf(stderr, "pushing hits\n");
             s6dataspec->s6hits.push_back(hit);
           }
         } 
@@ -619,6 +642,22 @@ void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb)
   if (*status) fits_report_error(stderr, *status);
 }
 
+double get_bammpwr1 (fitsfile * fptr, int * status)
+{
+  double bammpwr1;
+  fits_read_key(fptr, TDOUBLE, "BAMMPWR1", &bammpwr1, NULL, status);
+  if (*status) fits_report_error(stderr, *status);
+  return(bammpwr1);
+}
+
+double get_bammpwr2 (fitsfile * fptr, int * status)
+{
+  double bammpwr2;
+  fits_read_key(fptr, TDOUBLE, "BAMMPWR2", &bammpwr2, NULL, status);
+  if (*status) fits_report_error(stderr, *status);
+  return(bammpwr2);
+}
+
 
 /*now works with both ao and gbt. Some finechannel per coarsechannel is
  * hardcoded in depending on which observatory is used. Should another
@@ -673,7 +712,9 @@ double calc_gbt_rfreq(double ifreq, double rf_reference,
   return rf;
 }
 
-int is_good_data_gb(double ifv1iffq, double rf_reference) {
+int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, double bammpwr2) {
+
+//fprintf(stderr, "if %lf rf_ref %lf\n", ifv1iffq, rf_reference);
 
 	int rv = 1;		// assume good until proven bad
 	
@@ -681,6 +722,10 @@ int is_good_data_gb(double ifv1iffq, double rf_reference) {
 	// signal at acquisition time
 	if(ifv1iffq == 0) 		rv = 0;
 	if(rf_reference == 0) 	rv = 0;
+
+	// Make sure input power levels are in range
+	if(bammpwr1 < -30.0 || bammpwr1 > -10.0) rv = 0;
+	if(bammpwr2 < -30.0 || bammpwr2 > -10.0) rv = 0;
 
 	return(rv);
 }
