@@ -112,6 +112,19 @@ struct BITMAP {
     }
 };
 
+int process_primary(fitsfile *fptr, s6dataspec_t * s6dataspec, int &testmode) {
+
+  int status = 0;
+  char telescope[FLEN_VALUE];
+
+  get_telescope(fptr, &status, telescope);
+  if(strcmp(telescope, "S6TEST") == 0) testmode = 1;
+  strncpy(s6dataspec->telescope, telescope, FLEN_VALUE);
+  s6dataspec->threshold = get_threshold(fptr, &status);
+
+  return(status);
+}
+
 /*get_s6data will populate a s6hits_t data type according to the data specs
  * given by the user in the s6dataspec argument. For more details please see
  * s6hits.h, which contains the two data types used here.*/
@@ -123,6 +136,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
   int status = 0;
   int hdupos = 0, nkeys;
   int testmode = 0;
+  // int testmode = 1;		// for testing
   int header_flag = 0;
   int obs_flag = 0;
   int good_data = 0;
@@ -149,11 +163,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
       //primary header
       if (hdupos == 0)
       {
-// TODO process_primary() ==========================================================
-        get_telescope(fptr, &status, telescope);
-		if(strcmp(telescope, "S6TEST") == 0) testmode = 1;
-		strncpy(s6dataspec->telescope, telescope, FLEN_VALUE);
-        s6dataspec->threshold = get_threshold(fptr, &status);
+		status = process_primary(fptr, s6dataspec, testmode);
       }
       //checks if the header we're looking at correspond to aoscram or gbt, and
       //if they do, get the coarchid and clock frequency once. Also sets the
@@ -161,7 +171,7 @@ int get_s6data(s6dataspec_t * s6dataspec)
       if (is_aoscram(fptr, &status, obs, &obs_flag) || 
           is_gbtstatus(fptr, &status, obs, &obs_flag))
       {
-// TODO process_meta_data() ==========================================================
+// TODO process_meta_data(coarchid, clock_freq, obs, good_data, good_data) ==========================================================
         if (!header_flag) 
         {
           coarchid = get_coarchid(fptr, &status);
@@ -195,10 +205,9 @@ int get_s6data(s6dataspec_t * s6dataspec)
 		  	good_data = is_good_data_gb(ifv1iffq, rf_reference, bammpwr1, bammpwr2);
 		  }
         }
-//s6dataspec->filterby_rf_reference_mode = 1;		// for testing
-//fprintf(stderr, "filterby_rf_reference_mode %d\n", s6dataspec->filterby_rf_reference_mode);
-//fprintf(stderr, "rf_reference %lf\n", rf_reference);
-  		if(s6dataspec->filterby_rf_reference_mode && rf_reference >= 0) 
+		// s6dataspec->filterby_rf_reference_mode = 1;		// for testing
+  		//if(s6dataspec->filterby_rf_reference_mode && rf_reference >= 0) 
+  		if(s6dataspec->filterby_rf_reference_mode && rf_reference != 0) 
 		{
 		  rf_reference_vec.push_back(rf_reference);
   		}
@@ -216,7 +225,6 @@ int get_s6data(s6dataspec_t * s6dataspec)
         total_missedpk += missedpk;
       }
       int nhits = get_nhits(fptr, &status);
-//fprintf(stderr, "nhits = %d bors %d good_data %d is_desired_bors = %d\n", nhits, bors, good_data, is_desired_bors(bors, s6dataspec->bors));
       if (is_ethits(fptr, &status) 					&& 
 		  nhits > 0 								&& 
 		  is_desired_bors(bors, s6dataspec->bors)	&&
@@ -247,10 +255,8 @@ int get_s6data(s6dataspec_t * s6dataspec)
 
         for (int i = 0; i < nhits; i++) 
         {
-//fprintf(stderr, "CC %d\n", coarch_array[i]);
           if (is_desired_coarchan(coarch_array[i], s6dataspec->channels))
           {
-//fprintf(stderr, "getting hits\n");
             s6hits_t hit;
             hit.unix_time = time;
             hit.julian_date = get_julian_from_unix((int) time);
@@ -277,7 +283,6 @@ int get_s6data(s6dataspec_t * s6dataspec)
               	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
             else 
 				hit.rfreq = -1;
-//fprintf(stderr, "pushing hits\n");
             s6dataspec->s6hits.push_back(hit);
           }
         } 
@@ -611,11 +616,22 @@ double get_if2synhz (fitsfile * fptr, int * status)
 
 int32_t get_signed_fc (int32_t fc, char * obs) 
 {
+  // signed fine channels should go as :
+  // 	max neg..........0..........max pos
+  // unsigned fine channels should go as :
+  //    0---------------------------max pos 	
+ 
   int32_t signed_fc;
+
+  // 		     select desired bits                     make int  leave int
+  //                  2**N-1        "our" sign bit neg ? negative  positive
   if (strcmp(obs, "AO") == 0)
-    signed_fc = (fc & 0x0001FFFF) | ((fc & 0x00010000) ? 0xFFFE0000 : 0);	
+    signed_fc = (fc & 0x0001FFFF) | ((fc & 0x00010000) ? 0xFFFE0000 : 0);	// 2**17 signed fc's 	
   else if (strcmp(obs, "GBT") == 0)
-    signed_fc = (fc & 0x0007FFFF) | ((fc & 0x00040000) ? 0xFFF80000 : 0);	
+    signed_fc = (fc & 0x0007FFFF) | ((fc & 0x00040000) ? 0xFFF80000 : 0);	// 2**19 signed fc's	
+  else if (strcmp(obs, "FAST") == 0)
+    signed_fc = fc;															// fc's are unsigned
+    //signed_fc = (fc & 0x0FFFFFFF) | ((fc & 0x08000000) ? 0xF0000000 : 0);	// 2**28 signed fc's		
   else signed_fc = -1;
   return signed_fc;
 }
@@ -665,24 +681,36 @@ double get_bammpwr2 (fitsfile * fptr, int * status)
 double calc_ifreq(double clock_freq, int coarchid, char * obs, 
                   int32_t signed_fc, unsigned short cc)
 {
+  // strcpy(obs, "FAST");	// for testing
+  // clock_freq = 1000.0;
+
   //differing constant
   int32_t fc_per_cc;
+  double cc_per_sys;
   if (strcmp(obs, "GBT") == 0) 
   {
+    cc_per_sys = 4096;
     fc_per_cc = pow(2.0, 19); 
     clock_freq = clock_freq * 2;
   }
   else if (strcmp(obs, "AO") == 0) 
   { 
+    cc_per_sys = 4096;
     fc_per_cc = pow(2.0, 17);
   }
-  double cc_per_sys = 4096;
-  double band_width = clock_freq/2;
-  double fc_bin_width = band_width/(cc_per_sys * fc_per_cc);
-  double resolution = fc_bin_width * 1000000;    
-  double sys_cc = coarchid + cc;
-  double sys_fc = fc_per_cc * sys_cc + signed_fc;
-  double ifreq = (sys_fc * resolution) / 1000000;   
+  else if (strcmp(obs, "FAST") == 0) 
+  { 
+    cc_per_sys = 1;
+    fc_per_cc = pow(2.0, 28);
+  }
+
+  double band_width 	= clock_freq/2;
+  double fc_bin_width 	= band_width/(cc_per_sys * fc_per_cc);
+  double resolution 	= fc_bin_width * 1000000;    
+  long sys_cc 			= coarchid + cc;
+  long sys_fc 			= fc_per_cc * sys_cc + signed_fc;
+  double ifreq 			= (sys_fc * resolution) / 1000000;   
+
   return ifreq;
 }
 
@@ -714,8 +742,6 @@ double calc_gbt_rfreq(double ifreq, double rf_reference,
 
 int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, double bammpwr2) {
 
-//fprintf(stderr, "if %lf rf_ref %lf\n", ifv1iffq, rf_reference);
-
 	int rv = 1;		// assume good until proven bad
 	
 	// if either of these is zero, there was not a usable 
@@ -724,7 +750,7 @@ int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, doubl
 	if(rf_reference == 0) 	rv = 0;
 
 	// Make sure input power levels are in range
-	if(bammpwr1 < -30.0 || bammpwr1 > -10.0) rv = 0;
+	//if(bammpwr1 < -30.0 || bammpwr1 > -10.0) rv = 0;		// TODO why commented out?
 	if(bammpwr2 < -30.0 || bammpwr2 > -10.0) rv = 0;
 
 	return(rv);
@@ -827,9 +853,7 @@ void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_reference_vec) {
 	BITMAP hit_filter;		// will be used by all filters
 
 	if(!s6dataspec->filterby_rf_reference_mode) return;
-//fprintf(stderr, "finding mode : size of hits is %ld bitmap is %ld bytes long\n", s6dataspec->s6hits.size(), hit_filter.get_size(s6dataspec->s6hits.size()));
     hit_filter.init((char*)calloc(1, BITMAP::get_size(s6dataspec->s6hits.size())));
-//fprintf(stderr, "bitmap is %ld bytes long\n", hit_filter.data.size());
 
 	// start rf center mode filter
 	std::sort(rf_reference_vec.begin(), rf_reference_vec.end());
@@ -842,7 +866,6 @@ void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_reference_vec) {
 				mode_count 			= mode_count_test;			
 				rf_reference_mode 		= rf_reference_vec[i-1];
 				rf_reference_mode_test = rf_reference_vec[i];
-//fprintf(stderr, "mode = %lf count = %ld\n", rf_reference_mode, mode_count);
 			}
 				mode_count_test = 1;
 		}
@@ -851,7 +874,6 @@ void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_reference_vec) {
 		rf_reference_mode = rf_reference_vec[i-1];
 	}
 	s6dataspec->rf_reference_mode = rf_reference_mode;
-//fprintf(stderr, "final mode = %lf (%lf) count = %ld\n", rf_reference_mode, rf_reference_vec[i-1], mode_count_test);
 	// now go through s6dataspec.s6hits, filtering any element with rf_reference != mode
 	for(unsigned long i=1; i < s6dataspec->s6hits.size(); i++) {
 		if(s6dataspec->s6hits[i].rf_reference != rf_reference_mode) {
@@ -1015,8 +1037,8 @@ void print_hits_structure (std::vector<s6hits_t> s6hits)
       printf("dec: %g\n", hit->dec);
       printf("missedpk: %d\n", hit->missedpk);
       /*binary table data*/
-      printf("detected power: %f\n", hit->detected_power);
-      printf("mean power: %f\n", hit->mean_power);
+      printf("detected power: %20.0f\n", hit->detected_power);
+      printf("mean power: %20.0f\n", hit->mean_power);
       printf("fine channel bin: %zu\n", (size_t) hit->fine_channel_bin);
       printf("coarse channel bin: %hu\n", hit->coarse_channel_bin);
       /*calculated frequencies*/ 
@@ -1050,8 +1072,8 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%15g", hit->dec);
     printf("%10d", hit->bors);
     printf("%10d", hit->missedpk);
-    printf("%20f", hit->detected_power);
-    printf("%20f", hit->mean_power);
+    printf("%22.0f", hit->detected_power);
+    printf("%22.0f", hit->mean_power);
     printf("%13d", (int)  hit->fine_channel_bin);
     printf("%10hu", hit->coarse_channel_bin);
     printf("%15f", hit->ifreq); 
