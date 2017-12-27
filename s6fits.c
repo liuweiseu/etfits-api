@@ -61,6 +61,9 @@ int is_aoscram(fitsfile * fptr, int * status,
 int is_gbtstatus(fitsfile * fptr, int * status, 
                  char * obs, int * obs_flag);
 
+int is_faststatus(fitsfile * fptr, int * status, 
+                 char * obs, int * obs_flag);
+
 int is_ethits (fitsfile * fptr, int * status);
 
 int is_ccpowers (fitsfile * fptr, int * status);
@@ -125,19 +128,161 @@ int process_primary(fitsfile *fptr, s6dataspec_t * s6dataspec, int &testmode) {
   return(status);
 }
 
+int process_meta_data(int &coarchid, 
+					  int &clock_freq, 
+					  char * obs, 
+  					  fitsfile *fptr,
+					  s6dataspec_t * s6dataspec, 
+  					  double rf_reference,
+  					  std::vector<double> &rf_reference_vec,
+					  int &good_data) {
+
+  double bammpwr1, bammpwr2;
+  double if2synhz, if1synhz;
+  double ifv1iffq;
+  char ifv1ssb[FLEN_VALUE];
+  int status = 0;
+  int testmode = 1;		// set to 1 for testing, 0 for production
+  static int first_time=0;
+
+  // grab the items that will not change over this file
+  if (!first_time) {
+  	coarchid = get_coarchid(fptr, &status);
+    clock_freq = get_clock_freq(fptr, &status);
+    first_time = 1;
+  }
+
+  //get LO settings for RF calculation and determine if data are good
+
+  if (strcmp(obs, "AO") == 0) {
+    if1synhz = get_if1synhz(fptr, &status);	// need for both ALFA and 327MHz 
+    if2synhz = get_if2synhz(fptr, &status);	// just need for 327MHz
+    rf_reference = if1synhz / 1000000;
+    //if (strcmp(telescope, "AO_327MHz") == 0) {
+    //		rf_reference = (if1synhz / 1000000) - (if2synhz / 1000000);
+    //     } else {		// assume ALFA
+	//	  }
+	 good_data = 1;	// TODO is assuming good data a good idea for AO?
+  }  // end AO 
+
+  else if (strcmp(obs, "GBT") == 0) {
+    if(testmode) {
+		good_data = 1;		// data are always good in test mode!
+    } else {
+      	get_ifv1ssb(fptr, &status, ifv1ssb);
+       	ifv1iffq = get_ifv1iffq(fptr, &status);
+       	rf_reference = get_ifv1csfq(fptr, &status); 
+	  	bammpwr1 = get_bammpwr1(fptr, &status);
+		bammpwr2 = get_bammpwr2(fptr, &status);
+	  	good_data = is_good_data_gb(ifv1iffq, rf_reference, bammpwr1, bammpwr2);
+	}
+  }  // end GBT 
+
+  else if (strcmp(obs, "FAST") == 0) {
+    if(testmode) {
+		good_data = 1;		// data are always good in test mode!
+	} else {
+		// TODO not implemented
+    }
+  }  // end FAST
+
+  s6dataspec->filterby_rf_reference_mode = 1;		// for testing
+  //if(s6dataspec->filterby_rf_reference_mode && rf_reference >= 0) 
+  if(s6dataspec->filterby_rf_reference_mode && rf_reference != 0) {
+  	rf_reference_vec.push_back(rf_reference);
+  }
+
+  return(status);
+}
+
+int process_hits(int &coarchid, 
+					  int &clock_freq, 
+					  char * obs, 
+					  char * telescope, 
+  					  fitsfile *fptr,
+					  s6dataspec_t * s6dataspec, 
+  					  double rf_reference,
+  					  std::vector<double> &rf_reference_vec,
+					  int &good_data) {
+  int status = 0;
+  int total_missedpk;
+  double if2synhz;
+  double ifv1iffq;
+  char ifv1ssb[FLEN_VALUE];
+
+  time_t time = get_time(fptr, &status);
+  double ra = get_RA(fptr, &status);
+  int bors = get_bors(fptr, obs, &status);
+  double dec = get_dec(fptr, &status);
+  int missedpk = get_missedpk(fptr, &status); 
+  if (missedpk > 0) {
+    total_missedpk += missedpk;
+  }
+  int nhits = get_nhits(fptr, &status);
+
+  if (nhits > 0 && is_desired_bors(bors, s6dataspec->bors)) {
+    int ncols, anynul;
+    long nrows; 
+
+    fits_get_num_rows(fptr, &nrows, &status);
+    fits_get_num_cols(fptr, &ncols, &status); 
+        
+    double detpow_array[nrows];
+    fits_read_col (fptr, TDOUBLE, 1, 1, 1, nrows, NULL, &detpow_array, &anynul, &status); 
+
+    double meanpow_array[nrows];
+    fits_read_col (fptr, TDOUBLE, 2, 1, 1, nrows, NULL, &meanpow_array, &anynul, &status); 
+
+    unsigned short coarch_array[nrows];
+    fits_read_col (fptr, TUSHORT, 3, 1, 1, nrows, NULL, &coarch_array, &anynul, &status); 
+        
+    unsigned long finechan_array[nrows];
+    fits_read_col (fptr, TULONG, 4, 1, 1, nrows, NULL, &finechan_array, &anynul, &status); 
+
+    for (int i = 0; i < nhits; i++) {
+      if (is_desired_coarchan(coarch_array[i], s6dataspec->channels)) {
+    		s6hits_t hit;
+        	hit.unix_time = time;
+        	hit.julian_date = get_julian_from_unix((int) time);
+        	if (strcmp(obs, "GBT") == 0)  
+          		hit.ra = ra/15;
+        	else  
+          		hit.ra = ra;
+        	hit.bors = bors;
+        	hit.dec = dec;
+        	hit.missedpk = missedpk;
+        	hit.user_flag = -1;
+        	hit.detected_power = detpow_array[i];
+        	hit.mean_power = meanpow_array[i];
+        	int32_t signed_fc = get_signed_fc(finechan_array[i], obs);
+        	hit.fine_channel_bin = signed_fc;
+        	hit.coarse_channel_bin = coarch_array[i];
+        	hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, signed_fc, coarch_array[i]);
+  			//hit.rfreq = rf_reference >= 0 ? rf_reference - hit.ifreq : -1;	// an rf_reference of -1 indicates a header error
+			hit.rf_reference = rf_reference;
+        	if (strcmp(obs, "AO") == 0) 
+       			hit.rfreq = calc_ao_rfreq(hit.ifreq, rf_reference, if2synhz, telescope);
+        	else if (strcmp(obs, "GBT") == 0) 
+              	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
+        	else 
+				hit.rfreq = -1;
+        	s6dataspec->s6hits.push_back(hit);
+	  }  // end if(is_desired_coarchan)
+    }  // end for(i < nhits)
+  }  // end if(nhits > 0 && is_desired_bors()) 
+
+  return(status);
+}
+
 /*get_s6data will populate a s6hits_t data type according to the data specs
  * given by the user in the s6dataspec argument. For more details please see
  * s6hits.h, which contains the two data types used here.*/
 
-int get_s6data(s6dataspec_t * s6dataspec) 
-{
+int get_s6data(s6dataspec_t * s6dataspec) {
   fitsfile *fptr;
-  /*status must be initialized to zero!*/
-  int status = 0;
+  int status = 0;		// status must be initialized to zero!
   int hdupos = 0, nkeys;
-  int testmode = 0;
-  // int testmode = 1;		// for testing
-  int header_flag = 0;
+  int testmode = 1;		// set to 1 for testing, 0 for production
   int obs_flag = 0;
   int good_data = 0;
   int total_missedpk;
@@ -146,153 +291,51 @@ int get_s6data(s6dataspec_t * s6dataspec)
   /*observatory, if another gets added with length > 3 change this*/
   char telescope[FLEN_VALUE];
   char obs[10];
-  double if2synhz, if1synhz;
-  double ifv1iffq;
-  char ifv1ssb[FLEN_VALUE];
   double rf_reference;
-  double bammpwr1, bammpwr2;
   std::vector<double> rf_reference_vec;
 
-  if (!fits_open_file(&fptr, filename, READONLY, &status))
-  {
-	// TODO factor out header logic
+  if (!fits_open_file(&fptr, filename, READONLY, &status)) {
+
     //fits_get_hdu_num(fptr, &hdupos); 
-    for (; !status; hdupos++) 
-    {
-//==========================================================
-      //primary header
-      if (hdupos == 0)
-      {
+    for (; !status; hdupos++) {
+
+      if (hdupos == 0) {
 		status = process_primary(fptr, s6dataspec, testmode);
       }
-      //checks if the header we're looking at correspond to aoscram or gbt, and
-      //if they do, get the coarchid and clock frequency once. Also sets the
-      //observatory.
-      if (is_aoscram(fptr, &status, obs, &obs_flag) || 
-          is_gbtstatus(fptr, &status, obs, &obs_flag))
-      {
-// TODO process_meta_data(coarchid, clock_freq, obs, good_data, good_data) ==========================================================
-        if (!header_flag) 
-        {
-          coarchid = get_coarchid(fptr, &status);
-          clock_freq = get_clock_freq(fptr, &status);
-          header_flag = 1;
-        }
-		//get LO settings for RF calculation
-        if (strcmp(obs, "AO") == 0) 
-        {
-          if1synhz = get_if1synhz(fptr, &status);	// need for both ALFA and 327MHz 
-          if2synhz = get_if2synhz(fptr, &status);	// just need for 327MHz
-		  rf_reference = if1synhz / 1000000;
-          //if (strcmp(telescope, "AO_327MHz") == 0)
-          // {
-          //		rf_reference = (if1synhz / 1000000) - (if2synhz / 1000000);
-          //     } else {		// assume ALFA
-	      //	  }
-	      good_data = 1;	// TODO is assuming good data a good idea for AO?
-        }
-        else if (strcmp(obs, "GBT") == 0) 
-        {
-		  if(testmode) 
-		  {
-			good_data = 1;		// data are always good in test mode!
-		  } else {
-          	get_ifv1ssb(fptr, &status, ifv1ssb);
-          	ifv1iffq = get_ifv1iffq(fptr, &status);
-          	rf_reference = get_ifv1csfq(fptr, &status); 
-			bammpwr1 = get_bammpwr1(fptr, &status);
-			bammpwr2 = get_bammpwr2(fptr, &status);
-		  	good_data = is_good_data_gb(ifv1iffq, rf_reference, bammpwr1, bammpwr2);
-		  }
-        }
-		// s6dataspec->filterby_rf_reference_mode = 1;		// for testing
-  		//if(s6dataspec->filterby_rf_reference_mode && rf_reference >= 0) 
-  		if(s6dataspec->filterby_rf_reference_mode && rf_reference != 0) 
-		{
-		  rf_reference_vec.push_back(rf_reference);
-  		}
-		//end get LO settings for RF calculation
-      }
-// TODO at hits header at this point
-      /* calculated and saved before we make the hit to save us the hassle of
- * grabbing it for each new hit in the binary table. TODO WAIT - each beam has diff coords*/
-      time_t time = get_time(fptr, &status);
-      double ra = get_RA(fptr, &status);
-      int bors = get_bors(fptr, obs, &status);
-      double dec = get_dec(fptr, &status);
-      int missedpk = get_missedpk(fptr, &status); 
-      if (missedpk > 0) {
-        total_missedpk += missedpk;
-      }
-      int nhits = get_nhits(fptr, &status);
-      if (is_ethits(fptr, &status) 					&& 
-		  nhits > 0 								&& 
-		  is_desired_bors(bors, s6dataspec->bors)	&&
-		  good_data)
-      {
-// TODO process_hits() ==========================================================
-        int ncols, anynul;
-        long nrows; 
 
-        fits_get_num_rows(fptr, &nrows, &status);
-        fits_get_num_cols(fptr, &ncols, &status); 
-        
-        double detpow_array[nrows];
-        fits_read_col (fptr, TDOUBLE, 1, 1, 1, nrows, NULL,
-            &detpow_array, &anynul, &status); 
+      else if (is_aoscram    (fptr, &status, obs, &obs_flag) || 
+          	   is_gbtstatus  (fptr, &status, obs, &obs_flag) ||
+          	   is_faststatus (fptr, &status, obs, &obs_flag)) {
+		status = process_meta_data(	coarchid, 
+						  		   	clock_freq, 
+						  			obs, 
+  						  			fptr,
+						  			s6dataspec, 
+  					  			   	rf_reference,
+  					  			   	rf_reference_vec,
+					  			   	good_data); 
 
-        double meanpow_array[nrows];
-        fits_read_col (fptr, TDOUBLE, 2, 1, 1, nrows, NULL,
-            &meanpow_array, &anynul, &status); 
+	  }
 
-        unsigned short coarch_array[nrows];
-        fits_read_col (fptr, TUSHORT, 3, 1, 1, nrows, NULL,
-            &coarch_array, &anynul, &status); 
-        
-        unsigned long finechan_array[nrows];
-        fits_read_col (fptr, TULONG, 4, 1, 1, nrows, NULL,
-            &finechan_array, &anynul, &status); 
+      else if (is_ethits(fptr, &status) && good_data) {
+		status = process_hits(	coarchid, 
+						  		   	clock_freq, 
+						  			obs, 
+									telescope,
+  						  			fptr,
+						  			s6dataspec, 
+  					  			   	rf_reference,
+  					  			   	rf_reference_vec,
+					  			   	good_data); 
 
-        for (int i = 0; i < nhits; i++) 
-        {
-          if (is_desired_coarchan(coarch_array[i], s6dataspec->channels))
-          {
-            s6hits_t hit;
-            hit.unix_time = time;
-            hit.julian_date = get_julian_from_unix((int) time);
-            if (strcmp(obs, "GBT") == 0) 
-              hit.ra = ra/15;
-            else 
-              hit.ra = ra;
-            hit.bors = bors;
-            hit.dec = dec;
-            hit.missedpk = missedpk;
-            hit.user_flag = -1;
-            hit.detected_power = detpow_array[i];
-            hit.mean_power = meanpow_array[i];
-            int32_t signed_fc = get_signed_fc(finechan_array[i], obs);
-            hit.fine_channel_bin = signed_fc;
-            hit.coarse_channel_bin = coarch_array[i];
-            hit.ifreq = calc_ifreq(clock_freq, coarchid, obs, 
-                                   signed_fc, coarch_array[i]);
-  			//hit.rfreq = rf_reference >= 0 ? rf_reference - hit.ifreq : -1;	// an rf_reference of -1 indicates a header error
-			hit.rf_reference = rf_reference;
-            if (strcmp(obs, "AO") == 0) 
-              	hit.rfreq = calc_ao_rfreq(hit.ifreq, rf_reference, if2synhz, telescope);
-            else if (strcmp(obs, "GBT") == 0) 
-              	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
-            else 
-				hit.rfreq = -1;
-            s6dataspec->s6hits.push_back(hit);
-          }
-        } 
-      }
+      }  // end if(is_ethits() && good_data)
       
       /*moves to next HDU*/
       fits_get_hdrspace(fptr, &nkeys, NULL, &status); 
       fits_movrel_hdu(fptr, 1, NULL, &status);
-    }  
-  }    
+    }  // end for(; !status; hdupos++)
+  }  // end if(!fits_open_file(&fptr, filename, READONLY, &status))
+
   status = 0;
   fits_close_file(fptr, &status);
  
@@ -307,7 +350,8 @@ int get_s6data(s6dataspec_t * s6dataspec)
   sort(s6dataspec);
   
   return (status);
-}
+}  // end int get_s6data(s6dataspec_t * s6dataspec)
+
 
 int get_s6ccpowers(s6dataspec_t * s6dataspec) 
 {
@@ -620,6 +664,7 @@ int32_t get_signed_fc (int32_t fc, char * obs)
   // 	max neg..........0..........max pos
   // unsigned fine channels should go as :
   //    0---------------------------max pos 	
+  //
  
   int32_t signed_fc;
 
@@ -681,8 +726,9 @@ double get_bammpwr2 (fitsfile * fptr, int * status)
 double calc_ifreq(double clock_freq, int coarchid, char * obs, 
                   int32_t signed_fc, unsigned short cc)
 {
-  // strcpy(obs, "FAST");	// for testing
-  // clock_freq = 1000.0;
+  strcpy(obs, "FAST");	// for testing
+  clock_freq = 1000.0;	// for testing
+  //coarchid = 0;
 
   //differing constant
   int32_t fc_per_cc;
@@ -782,6 +828,24 @@ int is_gbtstatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
     if (!*obs_flag) 
     {
       strcpy(obs, "GBT");
+      *obs_flag = 1;
+    }
+    return 1;
+  }
+  if (*status == KEY_NO_EXIST) *status=0;
+  return 0; 
+}
+
+int is_faststatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+{
+
+  char extname[FLEN_VALUE];
+  fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
+  if (strcmp(extname, "FASTSTATUS") == 0)
+  {
+    if (!*obs_flag) 
+    {
+      strcpy(obs, "FAST");
       *obs_flag = 1;
     }
     return 1;
