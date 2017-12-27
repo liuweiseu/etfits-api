@@ -9,91 +9,50 @@
 
 /*function declarations*/
 int get_nsubband (fitsfile * fptr, int * status);
-
 void get_telescope (fitsfile * fptr, int * status, char * telescope);
-
 float get_threshold (fitsfile * fptr, int * status);
-
 time_t get_time (fitsfile * fptr, int * status);
-
 double get_RA (fitsfile * fptr, int * status);
-
 int get_bors (fitsfile * fptr, char * obs, int * status);
-
 double get_dec (fitsfile * fptr, int * status);
-
 int get_nhits (fitsfile * fptr, int * status);
-
 int get_missedpk (fitsfile * fptr, int * status);
-
 int get_coarchid (fitsfile * fptr, int * status);
-        
 double get_clock_freq (fitsfile * fptr, int * status);
-
 int32_t get_signed_fc (int32_t fc, char * obs);
-
 double get_if1synhz (fitsfile * fptr, int * status);
-
 double get_if2synhz (fitsfile * fptr, int * status);
-
 double get_ifv1csfq (fitsfile * fptr, int * status);
-
 double get_ifv1iffq (fitsfile * fptr, int * status);
-
 void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb);
-
 double get_bammpwr1 (fitsfile * fptr, int * status);
-
 double get_bammpwr2 (fitsfile * fptr, int * status);
-
 double calc_ifreq(double clock_freq, int coarchid, char * obs,  
                   int32_t signed_fc, unsigned short cc);
-
 double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * telescope);
-
 double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char * ifv1ssb);
-
 int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, double bammpwr2);
-
 int is_aoscram(fitsfile * fptr, int * status, 
                char * obs, int * obs_flag);
-
 int is_gbtstatus(fitsfile * fptr, int * status, 
                  char * obs, int * obs_flag);
-
 int is_faststatus(fitsfile * fptr, int * status, 
                  char * obs, int * obs_flag);
-
 int is_ethits (fitsfile * fptr, int * status);
-
 int is_ccpowers (fitsfile * fptr, int * status);
-
 int is_desired_bors (int bors, std::vector<int> desired_bors);
-
 int is_desired_coarchan (int cc, std::vector<int> desired_coarchan);
-
 double get_julian_from_unix (int unix_time);
-
 int find (int val, std::vector<int> vec);
-
 void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_reference_vec);
-
 void sort_bors(std::vector<s6hits_t> s6hits);
-
 void sort_time(std::vector<s6hits_t> s6hits);
-
 void sort_ifreq(std::vector<s6hits_t> s6hits);
-
 void sort_rfreq(std::vector<s6hits_t> s6hits);
-
 bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs);
-
 bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs);
-
 bool cmpifreq(const s6hits_t &lhs, const s6hits_t &rhs);
-
 bool cmprfreq(const s6hits_t &lhs, const s6hits_t &rhs);
-
 void sort(s6dataspec_t * s6dataspec);
 
 // represents an array of booleans
@@ -115,7 +74,9 @@ struct BITMAP {
     }
 };
 
+//------------------------------------------------------------------------------
 int process_primary(fitsfile *fptr, s6dataspec_t * s6dataspec, int &testmode) {
+//------------------------------------------------------------------------------
 
   int status = 0;
   char telescope[FLEN_VALUE];
@@ -128,6 +89,7 @@ int process_primary(fitsfile *fptr, s6dataspec_t * s6dataspec, int &testmode) {
   return(status);
 }
 
+//------------------------------------------------------------------------------
 int process_meta_data(int &coarchid, 
 					  int &clock_freq, 
 					  char * obs, 
@@ -136,6 +98,7 @@ int process_meta_data(int &coarchid,
   					  double rf_reference,
   					  std::vector<double> &rf_reference_vec,
 					  int &good_data) {
+//------------------------------------------------------------------------------
 
   double bammpwr1, bammpwr2;
   double if2synhz, if1synhz;
@@ -195,6 +158,7 @@ int process_meta_data(int &coarchid,
   return(status);
 }
 
+//------------------------------------------------------------------------------
 int process_hits(int &coarchid, 
 					  int &clock_freq, 
 					  char * obs, 
@@ -204,6 +168,7 @@ int process_hits(int &coarchid,
   					  double rf_reference,
   					  std::vector<double> &rf_reference_vec,
 					  int &good_data) {
+//------------------------------------------------------------------------------
   int status = 0;
   int total_missedpk;
   double if2synhz;
@@ -278,7 +243,9 @@ int process_hits(int &coarchid,
  * given by the user in the s6dataspec argument. For more details please see
  * s6hits.h, which contains the two data types used here.*/
 
+//------------------------------------------------------------------------------
 int get_s6data(s6dataspec_t * s6dataspec) {
+//------------------------------------------------------------------------------
   fitsfile *fptr;
   int status = 0;		// status must be initialized to zero!
   int hdupos = 0, nkeys;
@@ -353,7 +320,9 @@ int get_s6data(s6dataspec_t * s6dataspec) {
 }  // end int get_s6data(s6dataspec_t * s6dataspec)
 
 
+//------------------------------------------------------------------------------
 int get_s6ccpowers(s6dataspec_t * s6dataspec) 
+//------------------------------------------------------------------------------
 {
   fitsfile *fptr;
   /*status must be initialized to zero!*/
@@ -480,7 +449,9 @@ int get_s6ccpowers(s6dataspec_t * s6dataspec)
   return (status);
 }
 
+//------------------------------------------------------------------------------
 int get_s6hitsheaders(s6dataspec_t * s6dataspec) 
+//------------------------------------------------------------------------------
 {
   fitsfile *fptr;
   /*status must be initialized to zero!*/
@@ -530,7 +501,9 @@ int get_s6hitsheaders(s6dataspec_t * s6dataspec)
 }
 
 //delete later
+//------------------------------------------------------------------------------
 int get_nsubband (fitsfile * fptr, int * status) 
+//------------------------------------------------------------------------------
 {
   int nsubs;
   fits_read_key(fptr, TINT, "NSUBBAND", &nsubs, NULL, status);
@@ -538,7 +511,9 @@ int get_nsubband (fitsfile * fptr, int * status)
   return (nsubs);
 }
 
+//------------------------------------------------------------------------------
 float get_threshold (fitsfile * fptr, int * status) 
+//------------------------------------------------------------------------------
 {
   float threshold;
   fits_read_key(fptr, TFLOAT, "THRSHOLD", &threshold, NULL, status);
@@ -547,7 +522,9 @@ float get_threshold (fitsfile * fptr, int * status)
 }
 
 /*gets telescope found in primary header*/
+//------------------------------------------------------------------------------
 void get_telescope (fitsfile * fptr, int * status, char * telescope)
+//------------------------------------------------------------------------------
 {
   fits_read_key(fptr, TSTRING, "TELESCOP", telescope, NULL, status);
   //telescope is in the primary header, this should only run once. If there's an
@@ -556,7 +533,9 @@ void get_telescope (fitsfile * fptr, int * status, char * telescope)
 }
 
 /*gets time found in the binary table header block*/
+//------------------------------------------------------------------------------
 time_t get_time (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   time_t time;
   fits_read_key(fptr, TINT, "TIME", &time, NULL, status);
@@ -565,7 +544,9 @@ time_t get_time (fitsfile * fptr, int * status)
 }
 
 /*gets RA found in the binary table header block*/
+//------------------------------------------------------------------------------
 double get_RA (fitsfile * fptr, int * status) 
+//------------------------------------------------------------------------------
 {
   double ra;
   fits_read_key(fptr, TDOUBLE, "RA", &ra, NULL, status);
@@ -574,7 +555,9 @@ double get_RA (fitsfile * fptr, int * status)
 }
 
 /*gets beampol found in the binary table header block*/
+//------------------------------------------------------------------------------
 int get_bors (fitsfile * fptr, char * obs, int * status)
+//------------------------------------------------------------------------------
 {
   int bors;
   fits_read_key(fptr, TINT, "BORSPOL", &bors, NULL, status);
@@ -596,7 +579,9 @@ int get_bors (fitsfile * fptr, char * obs, int * status)
 }
 
 /*gets declination found in the binary table header block*/
+//------------------------------------------------------------------------------
 double get_dec (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double dec;
   fits_read_key(fptr, TDOUBLE, "DEC", &dec, NULL, status);
@@ -606,7 +591,9 @@ double get_dec (fitsfile * fptr, int * status)
 
 /*gets nhits found in the binary table header block. Used for testing to see if
  * we should look in the binary table or not and finding total hits in a file*/
+//------------------------------------------------------------------------------
 int get_nhits (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   int nhits;
   fits_read_key(fptr, TINT, "NHITS", &nhits, NULL, status);
@@ -615,7 +602,9 @@ int get_nhits (fitsfile * fptr, int * status)
 }
 
 /*gets missed packets found in the binary table header block*/
+//------------------------------------------------------------------------------
 int get_missedpk (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   int missedpk;
   fits_read_key(fptr, TINT, "MISSEDPK", &missedpk, NULL, status);
@@ -625,7 +614,9 @@ int get_missedpk (fitsfile * fptr, int * status)
 
 /*coarchid and clock_freq are found in AOSCRAM or GBTSTATUS. They are both
  * used in calculating intermediate frequency.*/
+//------------------------------------------------------------------------------
 int get_coarchid (fitsfile * fptr, int * status) 
+//------------------------------------------------------------------------------
 {
   int coarchid;
   fits_read_key(fptr, TINT, "COARCHID", &coarchid, NULL, status);
@@ -633,7 +624,9 @@ int get_coarchid (fitsfile * fptr, int * status)
   return (coarchid);
 }
         
+//------------------------------------------------------------------------------
 double get_clock_freq (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   int clock_freq;
   fits_read_key(fptr, TINT, "CLOCKFRQ", &clock_freq, NULL, status);
@@ -642,7 +635,9 @@ double get_clock_freq (fitsfile * fptr, int * status)
 }
 
 /*if1synhz and if2synhz are used to calculate sky frequency*/
+//------------------------------------------------------------------------------
 double get_if1synhz (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double if1synhz;
   fits_read_key(fptr, TDOUBLE, "IF1SYNHZ", &if1synhz, NULL, status);
@@ -650,7 +645,9 @@ double get_if1synhz (fitsfile * fptr, int * status)
   return (if1synhz);
 }
 
+//------------------------------------------------------------------------------
 double get_if2synhz (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double if2synhz;
   fits_read_key(fptr, TDOUBLE, "IF2SYNHZ", &if2synhz, NULL, status);
@@ -658,7 +655,9 @@ double get_if2synhz (fitsfile * fptr, int * status)
   return (if2synhz);
 }
 
+//------------------------------------------------------------------------------
 int32_t get_signed_fc (int32_t fc, char * obs) 
+//------------------------------------------------------------------------------
 {
   // signed fine channels should go as :
   // 	max neg..........0..........max pos
@@ -681,7 +680,9 @@ int32_t get_signed_fc (int32_t fc, char * obs)
   return signed_fc;
 }
 
+//------------------------------------------------------------------------------
 double get_ifv1csfq (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double ifv1csfq;
   fits_read_key(fptr, TDOUBLE, "IFV1CSFQ", &ifv1csfq, NULL, status);
@@ -689,7 +690,9 @@ double get_ifv1csfq (fitsfile * fptr, int * status)
   return (ifv1csfq);
 }
 
+//------------------------------------------------------------------------------
 double get_ifv1iffq (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double ifv1iffq;
   fits_read_key(fptr, TDOUBLE, "IFV1IFFQ", &ifv1iffq, NULL, status);
@@ -697,13 +700,17 @@ double get_ifv1iffq (fitsfile * fptr, int * status)
   return (ifv1iffq);
 }
 
+//------------------------------------------------------------------------------
 void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb)
+//------------------------------------------------------------------------------
 {
   fits_read_key(fptr, TSTRING, "IFV1SSB", ifv1ssb, NULL, status);
   if (*status) fits_report_error(stderr, *status);
 }
 
+//------------------------------------------------------------------------------
 double get_bammpwr1 (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double bammpwr1;
   fits_read_key(fptr, TDOUBLE, "BAMMPWR1", &bammpwr1, NULL, status);
@@ -711,7 +718,9 @@ double get_bammpwr1 (fitsfile * fptr, int * status)
   return(bammpwr1);
 }
 
+//------------------------------------------------------------------------------
 double get_bammpwr2 (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   double bammpwr2;
   fits_read_key(fptr, TDOUBLE, "BAMMPWR2", &bammpwr2, NULL, status);
@@ -723,8 +732,10 @@ double get_bammpwr2 (fitsfile * fptr, int * status)
 /*now works with both ao and gbt. Some finechannel per coarsechannel is
  * hardcoded in depending on which observatory is used. Should another
  * observatory be added, this function will need to be updated*/
+//------------------------------------------------------------------------------
 double calc_ifreq(double clock_freq, int coarchid, char * obs, 
                   int32_t signed_fc, unsigned short cc)
+//------------------------------------------------------------------------------
 {
   strcpy(obs, "FAST");	// for testing
   clock_freq = 1000.0;	// for testing
@@ -761,7 +772,9 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
 }
 
 /*calculates sky frequency for AO*/
+//------------------------------------------------------------------------------
 double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * telescope)
+//------------------------------------------------------------------------------
 //double calc_ao_rfreq(char * telescope, double if1synhz, 
 //                  double if2synhz, double ifreq)
 {
@@ -786,7 +799,9 @@ double calc_gbt_rfreq(double ifreq, double rf_reference,
   return rf;
 }
 
+//------------------------------------------------------------------------------
 int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, double bammpwr2) {
+//------------------------------------------------------------------------------
 
 	int rv = 1;		// assume good until proven bad
 	
@@ -802,7 +817,9 @@ int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, doubl
 	return(rv);
 }
 
+//------------------------------------------------------------------------------
 int is_aoscram (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+//------------------------------------------------------------------------------
 {
   char extname[FLEN_VALUE];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
@@ -819,7 +836,9 @@ int is_aoscram (fitsfile * fptr, int * status, char * obs, int * obs_flag)
   return 0;
 }
 
+//------------------------------------------------------------------------------
 int is_gbtstatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+//------------------------------------------------------------------------------
 {
   char extname[FLEN_VALUE];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
@@ -836,7 +855,9 @@ int is_gbtstatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
   return 0; 
 }
 
+//------------------------------------------------------------------------------
 int is_faststatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+//------------------------------------------------------------------------------
 {
 
   char extname[FLEN_VALUE];
@@ -855,7 +876,9 @@ int is_faststatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
 }
 
 /*determine if the hdu we're looking at will include the hits or not*/
+//------------------------------------------------------------------------------
 int is_ethits (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   char extname[16];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);  
@@ -864,7 +887,9 @@ int is_ethits (fitsfile * fptr, int * status)
   else return 0; 
 }
 
+//------------------------------------------------------------------------------
 int is_ccpowers (fitsfile * fptr, int * status)
+//------------------------------------------------------------------------------
 {
   char extname[16];
   fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);  
@@ -874,7 +899,9 @@ int is_ccpowers (fitsfile * fptr, int * status)
 }
 
 /*convert from unix time to julian date*/
+//------------------------------------------------------------------------------
 double get_julian_from_unix (int unix_time)
+//------------------------------------------------------------------------------
 {
   return (double(unix_time) / 86400.0) + 2440587.5;
 }
@@ -882,7 +909,9 @@ double get_julian_from_unix (int unix_time)
 /*determines if we want to grab hits depending on the beampol/spectra provided
  * by the user. If no specifications are given (empty bors vector), then we'll
  * return 1 for everything*/
+//------------------------------------------------------------------------------
 int is_desired_bors (int bors, std::vector<int> desired_bors) 
+//------------------------------------------------------------------------------
 {
   if (desired_bors.empty()) return 1;
   if (find(bors, desired_bors)) return 1;
@@ -890,7 +919,9 @@ int is_desired_bors (int bors, std::vector<int> desired_bors)
 }
 
 /*same thing as above but for coarse channels*/
+//------------------------------------------------------------------------------
 int is_desired_coarchan (int cc, std::vector<int> desired_coarchan) 
+//------------------------------------------------------------------------------
 {
   if (desired_coarchan.empty()) return 1;
   if (find(cc, desired_coarchan)) return 1;
@@ -899,7 +930,9 @@ int is_desired_coarchan (int cc, std::vector<int> desired_coarchan)
 
 /*might replace this with std::find since I have to include algorithm for sort
  * anyway*/
+//------------------------------------------------------------------------------
 int find (int val, std::vector<int> vec)
+//------------------------------------------------------------------------------
 {
   for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
   {
@@ -908,7 +941,9 @@ int find (int val, std::vector<int> vec)
   return 0;
 }
 
+//------------------------------------------------------------------------------
 void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_reference_vec) {
+//------------------------------------------------------------------------------
 
 	double rf_reference_mode, rf_reference_mode_test;
 	unsigned long mode_count=1, mode_count_test=1;
@@ -961,7 +996,9 @@ void filter(s6dataspec_t * s6dataspec, std::vector<double> &rf_reference_vec) {
 	s6dataspec->s6hits.swap(filtered_hits);
 }
 
+//------------------------------------------------------------------------------
 void sort(s6dataspec_t * s6dataspec)
+//------------------------------------------------------------------------------
 {
   char const* sort_order[3] = {"", "", ""};
   if (s6dataspec->sortby_bors > 0) {
@@ -999,47 +1036,65 @@ void sort(s6dataspec_t * s6dataspec)
 }
 
 //none of these comparison functions actually work
+//------------------------------------------------------------------------------
 bool cmpbors(const s6hits_t &lhs, const s6hits_t &rhs)
+//------------------------------------------------------------------------------
 {
   return lhs.bors < rhs.bors;
 }
 
+//------------------------------------------------------------------------------
 void sort_bors(std::vector<s6hits_t> s6hits)
+//------------------------------------------------------------------------------
 {
   std::stable_sort(s6hits.begin(), s6hits.end(), cmpbors);
 }
 
+//------------------------------------------------------------------------------
 bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs)
+//------------------------------------------------------------------------------
 {
   return lhs.unix_time < rhs.unix_time;
 }
 
+//------------------------------------------------------------------------------
 void sort_time(std::vector<s6hits_t> s6hits)
+//------------------------------------------------------------------------------
 {
   std::stable_sort(s6hits.begin(), s6hits.end(), cmptime);
 }
 
+//------------------------------------------------------------------------------
 bool cmpifreq(const s6hits_t &lhs, const s6hits_t &rhs)
+//------------------------------------------------------------------------------
 {
   return lhs.ifreq < rhs.ifreq;
 }
 
+//------------------------------------------------------------------------------
 void sort_ifreq(std::vector<s6hits_t> s6hits)
+//------------------------------------------------------------------------------
 {
   std::stable_sort(s6hits.begin(), s6hits.end(), cmpifreq);
 }
 
+//------------------------------------------------------------------------------
 bool cmprfreq(const s6hits_t &lhs, const s6hits_t &rhs)
+//------------------------------------------------------------------------------
 {
   return lhs.rfreq < rhs.rfreq;
 }
 
+//------------------------------------------------------------------------------
 void sort_rfreq(std::vector<s6hits_t> s6hits)
+//------------------------------------------------------------------------------
 {
   std::stable_sort(s6hits.begin(), s6hits.end(), cmprfreq);
 }
 
+//------------------------------------------------------------------------------
 time_t get_time_over_file (char * filename) 
+//------------------------------------------------------------------------------
 {
   fitsfile *fptr;
   int status = 0;
@@ -1066,7 +1121,9 @@ time_t get_time_over_file (char * filename)
   return (last - initial);
 }
 
+//------------------------------------------------------------------------------
 int get_hits_over_file (char * filename) 
+//------------------------------------------------------------------------------
 {
   fitsfile *fptr;
   int status = 0;
@@ -1088,7 +1145,9 @@ int get_hits_over_file (char * filename)
   return total_hits;
 }
 
+//------------------------------------------------------------------------------
 void print_hits_structure (std::vector<s6hits_t> s6hits) 
+//------------------------------------------------------------------------------
 {
     for (std::vector<s6hits_t>::iterator hit = s6hits.begin() ; 
          hit != s6hits.end(); ++hit)
@@ -1112,7 +1171,9 @@ void print_hits_structure (std::vector<s6hits_t> s6hits)
     }
 }
 
+//------------------------------------------------------------------------------
 void print_hits_table (std::vector<s6hits_t> s6hits)
+//------------------------------------------------------------------------------
 {
   printf("%15s", "Unix Time");
   printf("%20s", "Julian Date");
@@ -1146,7 +1207,9 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
   }
 }
 
+//------------------------------------------------------------------------------
 void print_ccpowers_table (std::vector<s6ccpowers_t> s6ccpowers)
+//------------------------------------------------------------------------------
 {
   printf("%15s", "Unix Time");
   printf("%20s", "Julian Date");
@@ -1169,7 +1232,10 @@ void print_ccpowers_table (std::vector<s6ccpowers_t> s6ccpowers)
     printf("%20f\n", ccpowers->power_y);
   }
 }
+
+//------------------------------------------------------------------------------
 void print_hits_header_table (std::vector<s6hitsheader_t> s6hitsheaders)
+//------------------------------------------------------------------------------
 {
   printf("%15s", "Unix Time");
   printf("%20s", "Julian Date");
