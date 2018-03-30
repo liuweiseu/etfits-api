@@ -20,24 +20,9 @@ int get_missedpk (fitsfile * fptr, int * status);
 int get_coarchid (fitsfile * fptr, int * status);
 double get_clock_freq (fitsfile * fptr, int * status);
 int32_t get_signed_fc (int32_t fc, char * obs);
-double get_if1synhz (fitsfile * fptr, int * status);
-double get_if2synhz (fitsfile * fptr, int * status);
-double get_ifv1csfq (fitsfile * fptr, int * status);
-double get_ifv1iffq (fitsfile * fptr, int * status);
-void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb);
-double get_bammpwr1 (fitsfile * fptr, int * status);
-double get_bammpwr2 (fitsfile * fptr, int * status);
 double calc_ifreq(double clock_freq, int coarchid, char * obs,  
                   int32_t signed_fc, unsigned short cc);
-double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * telescope);
-double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char * ifv1ssb);
 int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, double bammpwr2);
-int is_aoscram(fitsfile * fptr, int * status, 
-               char * obs, int * obs_flag);
-int is_gbtstatus(fitsfile * fptr, int * status, 
-                 char * obs, int * obs_flag);
-int is_faststatus(fitsfile * fptr, int * status, 
-                 char * obs, int * obs_flag);
 int is_ethits (fitsfile * fptr, int * status);
 int is_ccpowers (fitsfile * fptr, int * status);
 int is_desired_bors (int bors, std::vector<int> desired_bors);
@@ -54,6 +39,28 @@ bool cmptime(const s6hits_t &lhs, const s6hits_t &rhs);
 bool cmpifreq(const s6hits_t &lhs, const s6hits_t &rhs);
 bool cmprfreq(const s6hits_t &lhs, const s6hits_t &rhs);
 void sort(s6dataspec_t * s6dataspec);
+
+// AO specific
+int is_aoscram(fitsfile * fptr, int * status, 
+               char * obs, int * obs_flag);
+double get_if1synhz (fitsfile * fptr, int * status);
+double get_if2synhz (fitsfile * fptr, int * status);
+void get_ifv1ssb (fitsfile * fptr, int * status, char * ifv1ssb);
+double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * telescope);
+
+// GBT specific
+int is_gbtstatus(fitsfile * fptr, int * status, 
+                 char * obs, int * obs_flag);
+double get_ifv1csfq (fitsfile * fptr, int * status);
+double get_ifv1iffq (fitsfile * fptr, int * status);
+double get_bammpwr1 (fitsfile * fptr, int * status);
+double get_bammpwr2 (fitsfile * fptr, int * status);
+double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char * ifv1ssb);
+
+// FAST specific
+int is_faststatus(fitsfile * fptr, int * status, 
+                 char * obs, int * obs_flag);
+double calc_fast_rfreq(double ifreq);
 
 // represents an array of booleans
 static char _bits[8] = {1, 2, 4, 8, 16, 32, 64, 128};
@@ -145,7 +152,7 @@ int process_meta_data(int &coarchid,
     if(testmode) {
 		good_data = 1;		// data are always good in test mode!
 	} else {
-		// TODO not implemented
+       	rf_reference = 0;	// TODO - is this correct? 
     }
   }  // end FAST
 
@@ -229,6 +236,8 @@ int process_hits(int &coarchid,
        			hit.rfreq = calc_ao_rfreq(hit.ifreq, rf_reference, if2synhz, telescope);
         	else if (strcmp(obs, "GBT") == 0) 
               	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
+        	else if (strcmp(obs, "FAST") == 0) 
+              	hit.rfreq = calc_fast_rfreq(hit.ifreq);
         	else 
 				hit.rfreq = -1;
         	s6dataspec->s6hits.push_back(hit);
@@ -737,10 +746,6 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
                   int32_t signed_fc, unsigned short cc)
 //------------------------------------------------------------------------------
 {
-  strcpy(obs, "FAST");	// for testing
-  clock_freq = 1000.0;	// for testing
-  //coarchid = 0;
-
   //differing constant
   int32_t fc_per_cc;
   double cc_per_sys;
@@ -768,6 +773,8 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   long sys_fc 			= fc_per_cc * sys_cc + signed_fc;
   double ifreq 			= (sys_fc * resolution) / 1000000;   
 
+//fprintf(stderr, "data from %s total BW %lf FC BW %lf MHz resolution %lf Hz this CC %ld this FC %ld IF %lf\n", obs, band_width,fc_bin_width,resolution,sys_cc,sys_fc,ifreq);
+
   return ifreq;
 }
 
@@ -786,8 +793,10 @@ double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * 
   return rf;	// -1 indicates an error
 }
 
+//------------------------------------------------------------------------------
 double calc_gbt_rfreq(double ifreq, double rf_reference, 
                       double ifv1iffq, char * ifv1ssb) 
+//------------------------------------------------------------------------------
 {
   double rf;
   if (strcmp(ifv1ssb, "upper") == 0)
@@ -797,6 +806,13 @@ double calc_gbt_rfreq(double ifreq, double rf_reference,
   else 
     rf = -1;
   return rf;
+}
+
+//------------------------------------------------------------------------------
+double calc_fast_rfreq(double ifreq)
+//------------------------------------------------------------------------------
+{
+  return(ifreq);
 }
 
 //------------------------------------------------------------------------------
