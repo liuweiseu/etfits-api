@@ -60,7 +60,7 @@ double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char *
 // FAST specific
 int is_faststatus(fitsfile * fptr, int * status, 
                  char * obs, int * obs_flag);
-double calc_fast_rfreq(double ifreq);
+double calc_fast_rfreq(double ifreq, double rf_reference);
 
 // represents an array of booleans
 static char _bits[8] = {1, 2, 4, 8, 16, 32, 64, 128};
@@ -102,7 +102,7 @@ int process_meta_data(int &coarchid,
 					  char * obs, 
   					  fitsfile *fptr,
 					  s6dataspec_t * s6dataspec, 
-  					  double rf_reference,
+  					  double &rf_reference,
   					  std::vector<double> &rf_reference_vec,
 					  int &good_data) {
 //------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ int process_meta_data(int &coarchid,
   double ifv1iffq;
   char ifv1ssb[FLEN_VALUE];
   int status = 0;
-  int testmode = 1;		// set to 1 for testing, 0 for production
+  int testmode = 0;		// set to 1 for testing, 0 for production
   static int first_time=0;
 
   // grab the items that will not change over this file
@@ -152,7 +152,12 @@ int process_meta_data(int &coarchid,
     if(testmode) {
 		good_data = 1;		// data are always good in test mode!
 	} else {
-       	rf_reference = 0;	// TODO - is this correct? 
+		good_data = 1;		// TODO is assuming good data a good idea for AO?
+       	rf_reference = 1000.0;	// For FAST, we sample sky frequency.
+								// FAST third nyquist zone 1000 to 1500 converts 
+								// down to 0 to 500 MHz It aliases down, all by itself, 
+								// and it's not flipped, as it's the third zone. 
+								// TODO - this value should be in the FITS file.
     }
   }  // end FAST
 
@@ -237,7 +242,7 @@ int process_hits(int &coarchid,
         	else if (strcmp(obs, "GBT") == 0) 
               	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
         	else if (strcmp(obs, "FAST") == 0) 
-              	hit.rfreq = calc_fast_rfreq(hit.ifreq);
+              	hit.rfreq = calc_fast_rfreq(hit.ifreq, rf_reference);
         	else 
 				hit.rfreq = -1;
         	s6dataspec->s6hits.push_back(hit);
@@ -258,7 +263,7 @@ int get_s6data(s6dataspec_t * s6dataspec) {
   fitsfile *fptr;
   int status = 0;		// status must be initialized to zero!
   int hdupos = 0, nkeys;
-  int testmode = 1;		// set to 1 for testing, 0 for production
+  int testmode = 0;		// set to 1 for testing, 0 for production
   int obs_flag = 0;
   int good_data = 0;
   int total_missedpk;
@@ -292,7 +297,6 @@ int get_s6data(s6dataspec_t * s6dataspec) {
 					  			   	good_data); 
 
 	  }
-
       else if (is_ethits(fptr, &status) && good_data) {
 		status = process_hits(	coarchid, 
 						  		   	clock_freq, 
@@ -809,10 +813,10 @@ double calc_gbt_rfreq(double ifreq, double rf_reference,
 }
 
 //------------------------------------------------------------------------------
-double calc_fast_rfreq(double ifreq)
+double calc_fast_rfreq(double ifreq, double rf_reference)
 //------------------------------------------------------------------------------
 {
-  return(ifreq);
+  return(ifreq + rf_reference);
 }
 
 //------------------------------------------------------------------------------
