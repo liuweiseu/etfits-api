@@ -1202,12 +1202,13 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
   printf("%10s", "BorS");
   printf("%10s", "MSDPK");
   printf("%20s", "DETPOW");
-  printf("%20s", "MEANPOW");
+  printf("%24s", "MEANPOW");
+  printf("%22s", "SNR");
   printf("%13s", "FINECHAN");
-  printf("%10s", "COARCHAN"); 
-  printf("%15s", "ifreq");
+  printf("%12s", "COARCHAN"); 
+  printf("%11s", "ifreq");
   printf("%15s", "rfreq");
-  printf("%15s\n", "rf_reference");
+  printf("%17s\n", "rf_reference");
   for (std::vector<s6hits_t>::iterator hit = s6hits.begin() ; 
          hit != s6hits.end(); ++hit)
   {
@@ -1219,6 +1220,7 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%10d", hit->missedpk);
     printf("%22.0f", hit->detected_power);
     printf("%22.0f", hit->mean_power);
+    printf("%22.0f", hit->detected_power/hit->mean_power);
     printf("%13d", (int)  hit->fine_channel_bin);
     printf("%10hu", hit->coarse_channel_bin);
     printf("%15f", hit->ifreq); 
