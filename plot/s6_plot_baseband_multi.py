@@ -15,11 +15,18 @@ import pdb # for debug
 
 def plot_multi_with_gnuplot(filelist):
 #	return sort_meanpower[:q], sort_ifreq[:q], base_filename
-	base_filename = ','.join([os.path.split(f)[-1] for f in filelist])
-	data_filename = base_filename+".bb_data"
-	plot_filename = base_filename+".bb.png"
-	for filename in filelist:
-		os.system('python load_file.py -f {} -t {}'.format(filename, data_filename))
+    count = 0
+    for f in filelist:
+        count = count +1
+    count = str(count)
+    base = ','.join([os.path.split(f)[-1] for f in filelist])
+    base_name = base.split(',')
+    base_name = base_name[0]
+    base_filename = ''.join(os.path.split(base_name))
+    data_filename = base_filename+"_plus_"+ count + "_files.bb_data"
+    plot_filename = base_filename+"_plus_"+ count + "_files.bb.png"
+    for filename in filelist:
+        os.system('python load_file.py -f {} -t {}'.format(filename, data_filename))
 	
 	# Reload data from `data_filename`, sort adn write
 	with open(data_filename,'r') as f:
