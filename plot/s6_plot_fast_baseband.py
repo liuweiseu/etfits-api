@@ -86,7 +86,7 @@ if __name__ == "__main__":
         print("Load: {}".format(filename))
         
         prefix, mxx, cache, beam_id, beam_pole, date, index = filename.split('_')
-        assert cache==''         # "__"
+        assert cache=='multibeam'         # "__"
         assert 1<=int(beam_id)<=19 # beam id
         assert 0<=int(beam_pole)<=1  # pole
         to_plot.setdefault(int(beam_id), []).append((filename, int(beam_pole)))
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             fullpath = os.path.join('hexplotcache', name[0][:-4]+'pkl')
             file = open(fullpath, 'rb')
             data = pickle.load(file)                      
-            x = data['ifreq']
+            x = data['rfreq']
             y = data['mean_power']
             file.close()
             
