@@ -14,7 +14,7 @@ def load_file(filename):
     spec.sortby_rfreq = 0
     spec.sortby_time = 0
     spec.sortby_bors = 0
-    spec.sortby_ifreq = 0
+    #spec.sortby_ifreq = 0
     # Setting up this mode will remove all those hits which shows change of RF due to 
     # smart frequency switching experiment. It only reads those hits which occur maximum number of time. 
     spec.filterby_rf_center_mode = 1
@@ -23,7 +23,7 @@ def load_file(filename):
 
     hitnum = int(s6fits.get_hits_over_file(spec.filename))
 
-    m_ifreq = [] 
+    m_rfreq = [] 
     m_unix_time = [] 
     m_meanpower = []
  
@@ -33,16 +33,16 @@ def load_file(filename):
     #MARK for i in range(0,hitnum-1):
     for i in range(hitnum):
         if spec.s6hits[i].unix_time == start_time:
-            m_ifreq.append(spec.s6hits[i].ifreq)
+            m_rfreq.append(spec.s6hits[i].rfreq)
             m_unix_time.append(spec.s6hits[i].unix_time)
             m_meanpower.append(spec.s6hits[i].mean_power)
         else:
             break
-    sort_ifreq_index = np.argsort(m_ifreq)
-    sort_ifreq = np.array(m_ifreq)[sort_ifreq_index]
-    sort_meanpower = np.array(m_meanpower)[sort_ifreq_index]
+    sort_rfreq_index = np.argsort(m_rfreq)
+    sort_rfreq = np.array(m_rfreq)[sort_rfreq_index]
+    sort_meanpower = np.array(m_meanpower)[sort_rfreq_index]
     
-    return sort_meanpower, sort_ifreq , base_filename
+    return sort_meanpower, sort_rfreq , base_filename
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="load partial data from source to target")
@@ -52,9 +52,9 @@ if __name__ == "__main__":
     filein = args.f
     fileto = args.t
 
-    mean_power, ifreq, _ = load_file(filein)
+    mean_power, rfreq, _ = load_file(filein)
     
-    data = {"mean_power":mean_power, "ifreq":ifreq}
+    data = {"mean_power":mean_power, "rfreq":rfreq}
     file_io = open(fileto,'wb')
     pickle.dump(data, file_io)
     file_io.close()
