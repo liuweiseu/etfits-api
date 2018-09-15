@@ -1,6 +1,7 @@
 %module s6fits
 %include "pyabc.i"
 %include "std_vector.i"
+%include "stdint.i"
 %{
 #include <stdio.h>
 #include <time.h>
