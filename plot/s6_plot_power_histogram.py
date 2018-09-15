@@ -36,7 +36,7 @@ def plot_data_with_gnuplot(spec):
 	# see http://psy.swansea.ac.uk/staff/carter/gnuplot/gnuplot_frequency.htm
 	cmd = 'set term png; set out "%s";                						\
 			set boxwidth 0.05 absolute ; set style fill solid 1.0 noborder; \
-			set title "%s"; unset key;                						\
+			set title "%s"; unset key; set logscale x;     					\
 		   	set xl "SNR"; set yl "number of hits"; 							\
 																			\
 			bin_width  = 0.1; bin_number(x) = floor(x/bin_width); 			\
@@ -50,8 +50,8 @@ def plot_data_with_gnuplot(spec):
 
 	os.system('gnuplot pow_gnuplot_cmds')
 
-	#os.remove("pow_gnuplot_cmds")
-	#os.remove(data_filename)
+	os.remove("pow_gnuplot_cmds")
+	os.remove(data_filename)
 
 	print flen,hitnum
 

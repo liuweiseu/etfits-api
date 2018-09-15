@@ -1,14 +1,15 @@
 #! /bin/bash
 
-export data_dir=/home/jeffc/build/serendip6/src
-
-for fitsfile in `ls ${data_dir}/*.working`; do
-    #echo $fitsfile
+for fitsfile in `ls *.fits`; do
+    echo $fitsfile
 	if [ ! -e $fitsfile.plotted ]
 	then
-		python ~/build/etfits_api/plot/s6_plot_waterfall.py $fitsfile
-		python ~/build/etfits_api/plot/s6_plot_power_histogram.py $fitsfile
-		python ~/build/etfits_api/plot/s6_plot_baseband.py $fitsfile
+		echo ...waterfall
+		python /usr/local/bin/s6_plot_waterfall.py $fitsfile
+		echo ...power histogram
+		python /usr/local/bin/s6_plot_power_histogram.py $fitsfile
+		echo ...baseband
+		python /usr/local/bin/s6_plot_baseband.py $fitsfile
 		touch $fitsfile.plotted
 	fi
 done
