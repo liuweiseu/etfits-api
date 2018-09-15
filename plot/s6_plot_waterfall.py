@@ -19,6 +19,8 @@ def plot_data_with_gnuplot(spec):
 	#print spec.total_missedpk
 	#print spec.rf_center_mode,spec.filter_rf_center_mode,spec.cfitsio_error
 
+	#print spec.s6hits[0].unix_time, spec.s6hits[1].unix_time
+
 	flen = float(s6fits.get_time_over_file(spec.filename))
 	hitnum = int(s6fits.get_hits_over_file(spec.filename))
 
@@ -28,9 +30,10 @@ def plot_data_with_gnuplot(spec):
 
 	data_f=open(data_filename, 'w')
 	start_time = spec.s6hits[0].unix_time
+	start_jtime = spec.s6hits[0].julian_date
 	for x in range(0, hitnum-1):
-		print >> data_f, spec.s6hits[x].unix_time - start_time, spec.s6hits[x].ifreq
-		#print spec.s6hits[x].unix_time - start_time, spec.s6hits[x].ifreq
+		#print >> data_f, spec.s6hits[x].unix_time - start_time, spec.s6hits[x].ifreq
+		print >> data_f, int((spec.s6hits[x].julian_date-start_jtime)*86400), spec.s6hits[x].rfreq
 	data_f.close()
 
 	cmd = 'set term png; set out "%s";                \
@@ -118,4 +121,5 @@ if __name__ == "__main__":
 	#s6fits.get_s6hitsheaders(spec)
 
 	#plot_data_with_matplotlib(spec)
+	#print spec.s6hits[0].unix_time, spec.s6hits[0].fine_channel_bin, spec.s6hits[0].julian_date
 	plot_data_with_gnuplot(spec)
