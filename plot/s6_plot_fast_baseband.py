@@ -1,4 +1,5 @@
-#-*-coding:utf-8-*-
+# -*- coding:utf-8 -*-
+
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, zoomed_inset_axes
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredDrawingArea
 from matplotlib.patches import CirclePolygon, Circle
@@ -55,6 +56,8 @@ def hexagonPlot(axin, x, y, centerxy=(0,0), radius=90, title='beam_0'): # best: 
     ada = AnchoredDrawingArea(0.0, 0.0, 0, 0, loc=10, pad=0, frameon=False)
     ada.da.add_artist(hexagon)
     new_ax.add_artist(ada)
+    new_ax.set_xlim(1000,1470)
+    new_ax.set_ylim(50000000,1000000000)
     new_ax.plot(x, y, 'r-', linewidth=2)
     new_ax.set_title(title)
     return new_ax
@@ -73,10 +76,10 @@ if __name__ == "__main__":
     png_name = args.png
 
     filelist = os.listdir(filein)
-    assert os.path.isdir('hexplotcache')==False,"hexplotcache exist."
+    assert os.path.isdir('hexplotcache')==False, "hexplotcache exist. remove the folder first."
     os.makedirs('hexplotcache') 
-    assert len(filelist)==38, "{} should have exact 38 fits files.".format(filein)
-    #save data to a cache directory
+    assert len(filelist)<=38, "{} should have no more than 38 fits files.".format(filein)
+    # save data to a cache directory
     to_plot = dict()
     for filename in filelist:        
         ffrom = os.path.join(filein, filename)
@@ -86,23 +89,24 @@ if __name__ == "__main__":
         print("Load: {}".format(filename))
         
         prefix, mxx, cache, beam_id, beam_pole, date, index = filename.split('_')
-        assert cache=='multibeam'         # "__"
+        assert cache=='TEST'         # "set up cache according to the name of fits file"
         assert 1<=int(beam_id)<=19 # beam id
         assert 0<=int(beam_pole)<=1  # pole
         to_plot.setdefault(int(beam_id), []).append((filename, int(beam_pole)))
 
-    # Adapto python 2.7
+    # Adapt to python 2.7
     radius = 110 # hexagon radius e.g. 60
     fsize = 20 # figure size e.g. 12
     beam_shift = setBeamPlotShift(length=1.8, bias=-0.14) # adjust the distance between hexagons e.g 1.65, -0.05
-    coef = 8 # Circle coef. e.g 8
+    coef = 8 # Circle coef. e.g 8. proportional to the radius of the circle
     
+    id_not_exist = set(range(1,20)) # record the beam_id that are not contained in the folder
     new_ax = dict()
     # Plot lines in hexagon
     fig, ax = plt.subplots(figsize=(fsize,fsize))
     axins = zoomed_inset_axes(ax, 0.1, loc=10)
     for beam_id, filenames in to_plot.items(): 
-        
+        id_not_exist -= {beam_id}
         for name in filenames:
             fullpath = os.path.join('hexplotcache', name[0][:-4]+'pkl')
             file = open(fullpath, 'rb')
@@ -120,7 +124,11 @@ if __name__ == "__main__":
                                               radius=radius, title='beam_{}'.format(beam_id))
             new_ax[beam_id].semilogy(x, y, c, linewidth=2, label='pole_{}'.format(beam_pole)) #  log view
         new_ax[beam_id].legend(loc="upper left",fontsize="x-small")
-        
+     # plot empty hexagons
+    for beam_id in id_not_exist:
+        new_ax[beam_id] = hexagonPlot(axins, [0], [0], centerxy=tuple(beam_shift[beam_id]),
+                                      radius=radius, title='beam_{}'.format(beam_id))
+    
     os.system("rm -rf hexplotcache")
     # Big cirle
     hexagon = Circle((0, 0), radius*5, 
