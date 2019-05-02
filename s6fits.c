@@ -1219,8 +1219,8 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%10d", hit->bors);
     printf("%10d", hit->missedpk);
     printf("%22.0f", hit->detected_power);
-    printf("%22.0f", hit->mean_power);
-    printf("%22.0f", hit->detected_power/hit->mean_power);
+    printf("%e", hit->mean_power);
+    printf("%e", hit->detected_power/hit->mean_power);
     printf("%13d", (int)  hit->fine_channel_bin);
     printf("%10hu", hit->coarse_channel_bin);
     printf("%15f", hit->ifreq); 
