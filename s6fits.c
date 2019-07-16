@@ -104,7 +104,8 @@ int process_meta_data(int &coarchid,
 					  s6dataspec_t * s6dataspec, 
   					  double &rf_reference,
   					  std::vector<double> &rf_reference_vec,
-					  int &good_data) {
+					  int &good_data,
+					  int init_meta_data) {
 //------------------------------------------------------------------------------
 
   double bammpwr1, bammpwr2;
@@ -113,13 +114,11 @@ int process_meta_data(int &coarchid,
   char ifv1ssb[FLEN_VALUE];
   int status = 0;
   int testmode = 0;		// set to 1 for testing, 0 for production
-  static int first_time=0;
 
   // grab the items that will not change over this file
-  if (!first_time) {
+  if (init_meta_data) {
   	coarchid = get_coarchid(fptr, &status);
     clock_freq = get_clock_freq(fptr, &status);
-    first_time = 1;
   }
 
   //get LO settings for RF calculation and determine if data are good
@@ -266,6 +265,7 @@ int get_s6data(s6dataspec_t * s6dataspec) {
   int testmode = 0;		// set to 1 for testing, 0 for production
   int obs_flag = 0;
   int good_data = 0;
+  int init_meta_data = 1;
   int total_missedpk;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
@@ -294,7 +294,9 @@ int get_s6data(s6dataspec_t * s6dataspec) {
 						  			s6dataspec, 
   					  			   	rf_reference,
   					  			   	rf_reference_vec,
-					  			   	good_data); 
+					  			   	good_data,
+									init_meta_data); 
+		if(init_meta_data) init_meta_data = 0;	// only pass init flag=1 once per call to get_s6data()
 
 	  }
       else if (is_ethits(fptr, &status) && good_data) {
