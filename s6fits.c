@@ -112,7 +112,7 @@ int process_meta_data(int &coarchid,
   double ifv1iffq;
   char ifv1ssb[FLEN_VALUE];
   int status = 0;
-  int testmode = 1;		// set to 1 for testing, 0 for production
+  int testmode = 0;		// set to 1 for testing, 0 for production
   static int first_time=0;
 
   // grab the items that will not change over this file
