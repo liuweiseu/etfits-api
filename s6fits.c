@@ -104,8 +104,7 @@ int process_meta_data(int &coarchid,
 					  s6dataspec_t * s6dataspec, 
   					  double &rf_reference,
   					  std::vector<double> &rf_reference_vec,
-					  int &good_data,
-					  int init_meta_data) {
+					  int &good_data) {
 //------------------------------------------------------------------------------
 
   double bammpwr1, bammpwr2;
@@ -113,13 +112,16 @@ int process_meta_data(int &coarchid,
   double ifv1iffq;
   char ifv1ssb[FLEN_VALUE];
   int status = 0;
-  int testmode = 0;		// set to 1 for testing, 0 for production
+  int testmode = 1;		// set to 1 for testing, 0 for production
+  static int first_time=0;
 
   // grab the items that will not change over this file
-  if (init_meta_data) {
+  if (!first_time) {
   	coarchid = get_coarchid(fptr, &status);
     clock_freq = get_clock_freq(fptr, &status);
+    first_time = 1;
   }
+
 
   //get LO settings for RF calculation and determine if data are good
 
@@ -148,16 +150,15 @@ int process_meta_data(int &coarchid,
   }  // end GBT 
 
   else if (strcmp(obs, "FAST") == 0) {
-    if(testmode) {
-		good_data = 1;		// data are always good in test mode!
-	} else {
-		good_data = 1;		// TODO is assuming good data a good idea for AO?
-       	rf_reference = 1000.0;	// For FAST, we sample sky frequency.
-								// FAST third nyquist zone 1000 to 1500 converts 
-								// down to 0 to 500 MHz It aliases down, all by itself, 
-								// and it's not flipped, as it's the third zone. 
+		// no meta data needed for FAST rf_reference, so ne need to test for testmode
+		good_data = 1;		//  TODO is assuming good data a good idea for FAST?
+		int nyquist_zone = 3;
+       	rf_reference = (nyquist_zone-1) * (double)clock_freq/2.0;	
+								// For FAST, we sample sky frequency at the third nyquist zone.
+								// As an example, with a clock freq of 1000MHz, the third 
+								// nyquist zone 1000MHz to 1500MHz converts down to 0 to 500MHz. 
+								// It aliases down all by itself and it's not flipped.   
 								// TODO - this value should be in the FITS file.
-    }
   }  // end FAST
 
   s6dataspec->filterby_rf_reference_mode = 1;		// for testing
@@ -195,6 +196,8 @@ int process_hits(int &coarchid,
     total_missedpk += missedpk;
   }
   int nhits = get_nhits(fptr, &status);
+
+//fprintf(stderr, "process_hits telescope %s\n", s6dataspec->telescope); 
 
   if (nhits > 0 && is_desired_bors(bors, s6dataspec->bors)) {
     int ncols, anynul;
@@ -237,7 +240,10 @@ int process_hits(int &coarchid,
   			//hit.rfreq = rf_reference >= 0 ? rf_reference - hit.ifreq : -1;	// an rf_reference of -1 indicates a header error
 			hit.rf_reference = rf_reference;
         	if (strcmp(obs, "AO") == 0) 
-       			hit.rfreq = calc_ao_rfreq(hit.ifreq, rf_reference, if2synhz, telescope);
+{
+//fprintf(stderr, "calling telescope %s\n", s6dataspec->telescope);
+       			hit.rfreq = calc_ao_rfreq(hit.ifreq, rf_reference, if2synhz, s6dataspec->telescope);
+}
         	else if (strcmp(obs, "GBT") == 0) 
               	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
         	else if (strcmp(obs, "FAST") == 0) 
@@ -265,7 +271,6 @@ int get_s6data(s6dataspec_t * s6dataspec) {
   int testmode = 0;		// set to 1 for testing, 0 for production
   int obs_flag = 0;
   int good_data = 0;
-  int init_meta_data = 1;
   int total_missedpk;
   char * filename = s6dataspec->filename;
   int coarchid, clock_freq;
@@ -277,6 +282,7 @@ int get_s6data(s6dataspec_t * s6dataspec) {
 
   if (!fits_open_file(&fptr, filename, READONLY, &status)) {
 
+//fprintf(stderr, "pre main loop %s\n", telescope);
     //fits_get_hdu_num(fptr, &hdupos); 
     for (; !status; hdupos++) {
 
@@ -294,9 +300,7 @@ int get_s6data(s6dataspec_t * s6dataspec) {
 						  			s6dataspec, 
   					  			   	rf_reference,
   					  			   	rf_reference_vec,
-					  			   	good_data,
-									init_meta_data); 
-		if(init_meta_data) init_meta_data = 0;	// only pass init flag=1 once per call to get_s6data()
+					  			   	good_data); 
 
 	  }
       else if (is_ethits(fptr, &status) && good_data) {
@@ -309,7 +313,6 @@ int get_s6data(s6dataspec_t * s6dataspec) {
   					  			   	rf_reference,
   					  			   	rf_reference_vec,
 					  			   	good_data); 
-
       }  // end if(is_ethits() && good_data)
       
       /*moves to next HDU*/
@@ -542,6 +545,7 @@ void get_telescope (fitsfile * fptr, int * status, char * telescope)
 //------------------------------------------------------------------------------
 {
   fits_read_key(fptr, TSTRING, "TELESCOP", telescope, NULL, status);
+//fprintf(stderr, "TELESCOP %s\n", telescope);
   //telescope is in the primary header, this should only run once. If there's an
   //error, something is very wrong.
   if (*status) fits_report_error(stderr, *status);
@@ -755,6 +759,7 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   //differing constant
   int32_t fc_per_cc;
   double cc_per_sys;
+//fprintf(stderr, "obs %s clock %lf coarchid %d signed_fc %ld cc %d\n", obs, clock_freq, coarchid, signed_fc, cc);
   if (strcmp(obs, "GBT") == 0) 
   {
     cc_per_sys = 4096;
@@ -769,17 +774,17 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   else if (strcmp(obs, "FAST") == 0) 
   { 
     cc_per_sys = 1;
-    fc_per_cc = pow(2.0, 28);
+    fc_per_cc = pow(2.0, 27);		// 512M real channels becomes 256M complex channels
   }
 
-  double band_width 	= clock_freq/2;
-  double fc_bin_width 	= band_width/(cc_per_sys * fc_per_cc);
-  double resolution 	= fc_bin_width * 1000000;    
+  double band_width 	= clock_freq/2;							// MHz
+  double fc_bin_width 	= band_width/(cc_per_sys * fc_per_cc);	// MHz
+  double resolution 	= fc_bin_width * 1000000;   			// Hz 
   long sys_cc 			= coarchid + cc;
   long sys_fc 			= fc_per_cc * sys_cc + signed_fc;
-  double ifreq 			= (sys_fc * resolution) / 1000000;   
+  double ifreq 			= (sys_fc * resolution) / 1000000;   	// MHz
 
-//fprintf(stderr, "data from %s total BW %lf FC BW %lf MHz resolution %lf Hz this CC %ld this FC %ld IF %lf\n", obs, band_width,fc_bin_width,resolution,sys_cc,sys_fc,ifreq);
+//fprintf(stderr, "data from %s total BW %lf FC BW %lf MHz resolution %lf Hz this CC %ld this FC %ld IF %lf\n", obs, band_width,fc_bin_width*1e6,resolution,sys_cc,sys_fc,ifreq);
 
   return ifreq;
 }
@@ -796,6 +801,7 @@ double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * 
   	rf = rf_reference >= 0 ? rf_reference - ifreq : -1;
   else if (strcmp(telescope, "AO_327MHz") == 0)
 	rf = rf_reference >= 0 ? rf_reference - ((if2synhz / 1000000) - ifreq) : -1;
+//fprintf(stderr, "telescope %s rf_reference %lf ifreq %lf rf %lf\n", telescope, rf_reference, ifreq, rf);
   return rf;	// -1 indicates an error
 }
 
@@ -826,7 +832,7 @@ int is_good_data_gb(double ifv1iffq, double rf_reference, double bammpwr1, doubl
 //------------------------------------------------------------------------------
 
 	int rv = 1;		// assume good until proven bad
-	
+
 	// if either of these is zero, there was not a usable 
 	// signal at acquisition time
 	if(ifv1iffq == 0) 		rv = 0;
@@ -1221,8 +1227,8 @@ void print_hits_table (std::vector<s6hits_t> s6hits)
     printf("%10d", hit->bors);
     printf("%10d", hit->missedpk);
     printf("%22.0f", hit->detected_power);
-    printf("%e", hit->mean_power);
-    printf("%e", hit->detected_power/hit->mean_power);
+    printf("%22.0f", hit->mean_power);
+    printf("%22.0f", hit->detected_power/hit->mean_power);
     printf("%13d", (int)  hit->fine_channel_bin);
     printf("%10hu", hit->coarse_channel_bin);
     printf("%15f", hit->ifreq); 
