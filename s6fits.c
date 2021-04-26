@@ -113,14 +113,10 @@ int process_meta_data(int &coarchid,
   char ifv1ssb[FLEN_VALUE];
   int status = 0;
   int testmode = 0;		// set to 1 for testing, 0 for production
-  static int first_time=0;
 
-  // grab the items that will not change over this file
-  if (!first_time) {
-  	coarchid = get_coarchid(fptr, &status);
-    clock_freq = get_clock_freq(fptr, &status);
-    first_time = 1;
-  }
+  // grab the meta data that is present for all observatories
+  coarchid = get_coarchid(fptr, &status);
+  clock_freq = get_clock_freq(fptr, &status);
 
 
   //get LO settings for RF calculation and determine if data are good
@@ -255,6 +251,7 @@ int process_hits(int &coarchid,
     }  // end for(i < nhits)
   }  // end if(nhits > 0 && is_desired_bors()) 
 
+  //fprintf(stderr, "nhits = %ld", nhits);
   return(status);
 }
 
@@ -802,7 +799,7 @@ double calc_ao_rfreq(double ifreq, double rf_reference, double if2synhz, char * 
   else if (strcmp(telescope, "AO_327MHz") == 0)
 	rf = rf_reference >= 0 ? rf_reference - ((if2synhz / 1000000) - ifreq) : -1;
 //fprintf(stderr, "telescope %s rf_reference %lf ifreq %lf rf %lf\n", telescope, rf_reference, ifreq, rf);
-  return rf;	// -1 indicates an error
+  return rf;   // -1 indicates an error
 }
 
 //------------------------------------------------------------------------------
