@@ -49,8 +49,8 @@ def plot_data_with_gnuplot(spec):
 
     os.system('gnuplot wf_gnuplot_cmds')
 
-    #os.remove("wf_gnuplot_cmds")
-    #os.remove(data_filename)
+    os.remove("wf_gnuplot_cmds")
+    os.remove(data_filename)
     
 
     #print flen,hitnum
