@@ -706,7 +706,9 @@ int32_t get_signed_fc (int32_t fc, char * obs)
     signed_fc = (fc & 0x0007FFFF) | ((fc & 0x00040000) ? 0xFFF80000 : 0);	// 2**19 signed fc's	
   else if (strcmp(obs, "FAST") == 0)
     signed_fc = fc;															// fc's are unsigned
-    //signed_fc = (fc & 0x0FFFFFFF) | ((fc & 0x08000000) ? 0xF0000000 : 0);	// 2**28 signed fc's		
+    //signed_fc = (fc & 0x0FFFFFFF) | ((fc & 0x08000000) ? 0xF0000000 : 0);	// 2**28 signed fc's	
+  else if (strcmp(obs, "MRO") == 0)
+    signed_fc = fc;		
   else signed_fc = -1;
   return signed_fc;
 }
@@ -788,7 +790,11 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
     cc_per_sys = 1;
     fc_per_cc = pow(2.0, 27);		// 512M real channels becomes 256M complex channels
   }
-
+  else if  (strcmp(obs, "MRO") == 0)
+  {
+    cc_per_sys = 1;
+    fc_per_cc = pow(2.0, 27);		// 512M real channels becomes 256M complex channels
+  }
   double band_width 	= clock_freq/2;							// MHz
   double fc_bin_width 	= band_width/(cc_per_sys * fc_per_cc);	// MHz
   double resolution 	= fc_bin_width * 1000000;   			// Hz 
