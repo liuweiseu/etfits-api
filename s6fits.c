@@ -161,9 +161,9 @@ int process_meta_data(int &coarchid,
 		good_data = 1;		//  TODO is assuming good data a good idea for FAST?
 		int nyquist_zone = 3;
         clock_freq = 1000;
-        coarchid = 1;
-       	rf_reference = (nyquist_zone-1) * (double)clock_freq/2.0;	
-        status = 0;
+       	//rf_reference = (nyquist_zone-1) * (double)clock_freq/2.0;	 
+        fits_read_key(fptr, TDOUBLE, "LO_FREQ", &rf_reference, NULL, &status);
+        //status = 0;
 								// For FAST, we sample sky frequency at the third nyquist zone.
 								// As an example, with a clock freq of 1000MHz, the third 
 								// nyquist zone 1000MHz to 1500MHz converts down to 0 to 500MHz. 
@@ -793,7 +793,7 @@ double calc_ifreq(double clock_freq, int coarchid, char * obs,
   else if  (strcmp(obs, "MRO") == 0)
   {
     cc_per_sys = 1;
-    fc_per_cc = pow(2.0, 27);		// 512M real channels becomes 256M complex channels
+    fc_per_cc = pow(2.0, 29);		// 512M real channels becomes 256M complex channels
   }
   double band_width 	= clock_freq/2;							// MHz
   double fc_bin_width 	= band_width/(cc_per_sys * fc_per_cc);	// MHz
