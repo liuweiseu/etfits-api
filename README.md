@@ -43,18 +43,19 @@ make _s6fits.so
     cd /data/serendip6_data
     python s6_plot_waterfall_py39.py xxxx.fits
     ```
-**Note:** When you run the script, please make sure you're using the same python environment when you compile the s6fits library.
+    **Note:** When you run the script, please make sure you're using the same python environment when you compile the s6fits library.
 * you can use `display` to look at the figure.
     ```
     disply xxx.wf.png
     ```
     **NOTE:** Please use `ssh -XY xx@xxx` to log into your server.
 ## Error and fix
-*   When you are tring to plot the waterfall figure, you may have the issue like this:
+*   When you are trying to plot the waterfall figure, you may have the issue like this:
     ```
     ImportError: /lib/x86_64-linux-gnu/libp11-kit.so.0: undefined symbol: ffi_type_pointer, version LIBFFI_BASE_7.0
     ```
-* If so, please cd to your python lib directory, and rename libffi.so.7. Then you need to create a new symbolic:
+* If so, please cd to your python lib directory, and rename libffi.so.7.   
+Then you need to create a new symbolic:
     ```
     cd /home/$USER/.conda/envs/seti/lib
     mv libffi.so.7 libffi.so.7.bak
