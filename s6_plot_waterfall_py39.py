@@ -38,7 +38,7 @@ def plot_data_with_gnuplot(spec):
     data_f.close()
 
     cmd = 'set term png; set out "%s";                \
-            set title "%s"; unset key;                \
+            set title "%s" noenhanced; unset key;                \
                set xl "Freq (MHz)"; set yl "Time (Sec)"; \
             plot "%s" using 2:1 with dots;'           \
             % (plot_filename, base_filename, data_filename)
