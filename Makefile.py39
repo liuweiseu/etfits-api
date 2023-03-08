@@ -1,7 +1,7 @@
 CC=g++
-CFLAGS=-I$(IDIR) -I/home/wei/.conda/envs/roach2_py2/include/python2.7 -Wall -fPIC -g
+CFLAGS=-I$(IDIR) -I/home/wei/.conda/envs/seti/include/python3.9 -Wall -fPIC -g
 LDFLAGS = -shared
-LIBS= -L /home/wei/.conda/envs/roach2_py2/lib -lm -lcfitsio -lpython2.7
+LIBS= -L /home/wei/.conda/envs/seti/lib -lm -lcfitsio -lpython3.9
 IDIR=/usr/include/cfitsio
 
 TARGET = test

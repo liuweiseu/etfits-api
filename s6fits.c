@@ -57,13 +57,15 @@ double get_bammpwr1 (fitsfile * fptr, int * status);
 double get_bammpwr2 (fitsfile * fptr, int * status);
 double calc_gbt_rfreq(double ifreq, double rf_reference, double ifv1iffq, char * ifv1ssb);
 
-// FAST specific
+// FAST & MRO specific
 int is_faststatus(fitsfile * fptr, int * status, 
+                 char * obs, int * obs_flag);
+int is_mrostatus(fitsfile * fptr, int * status, 
                  char * obs, int * obs_flag);
 double calc_fast_rfreq(double ifreq, double rf_reference);
 
 // represents an array of booleans
-static char _bits[8] = {1, 2, 4, 8, 16, 32, 64, 128};
+static char _bits[8] = {1, 2, 4, 8, 16, 32, 64, (char)128};
 struct BITMAP {
     char* data;
     static inline long get_size(long n) {
@@ -113,11 +115,9 @@ int process_meta_data(int &coarchid,
   char ifv1ssb[FLEN_VALUE];
   int status = 0;
   int testmode = 0;		// set to 1 for testing, 0 for production
-
   // grab the meta data that is present for all observatories
   coarchid = get_coarchid(fptr, &status);
   clock_freq = get_clock_freq(fptr, &status);
-
 
   //get LO settings for RF calculation and determine if data are good
 
@@ -156,6 +156,20 @@ int process_meta_data(int &coarchid,
 								// It aliases down all by itself and it's not flipped.   
 								// TODO - this value should be in the FITS file.
   }  // end FAST
+  else if (strcmp(obs, "MRO") == 0) {
+		// no meta data needed for FAST rf_reference, so ne need to test for testmode
+		good_data = 1;		//  TODO is assuming good data a good idea for FAST?
+		int nyquist_zone = 3;
+        clock_freq = 1000;
+        coarchid = 1;
+       	rf_reference = (nyquist_zone-1) * (double)clock_freq/2.0;	
+        status = 0;
+								// For FAST, we sample sky frequency at the third nyquist zone.
+								// As an example, with a clock freq of 1000MHz, the third 
+								// nyquist zone 1000MHz to 1500MHz converts down to 0 to 500MHz. 
+								// It aliases down all by itself and it's not flipped.   
+								// TODO - this value should be in the FITS file.
+  }  // end MRO
 
   s6dataspec->filterby_rf_reference_mode = 1;		// for testing
   //if(s6dataspec->filterby_rf_reference_mode && rf_reference >= 0) 
@@ -244,6 +258,8 @@ int process_hits(int &coarchid,
               	hit.rfreq = calc_gbt_rfreq(hit.ifreq, rf_reference, ifv1iffq, ifv1ssb);
         	else if (strcmp(obs, "FAST") == 0) 
               	hit.rfreq = calc_fast_rfreq(hit.ifreq, rf_reference);
+          else if (strcmp(obs, "MRO") == 0) 
+              	hit.rfreq = calc_fast_rfreq(hit.ifreq, rf_reference);
         	else 
 				hit.rfreq = -1;
         	s6dataspec->s6hits.push_back(hit);
@@ -276,9 +292,7 @@ int get_s6data(s6dataspec_t * s6dataspec) {
   char obs[10];
   double rf_reference;
   std::vector<double> rf_reference_vec;
-
   if (!fits_open_file(&fptr, filename, READONLY, &status)) {
-
 //fprintf(stderr, "pre main loop %s\n", telescope);
     //fits_get_hdu_num(fptr, &hdupos); 
     for (; !status; hdupos++) {
@@ -289,7 +303,8 @@ int get_s6data(s6dataspec_t * s6dataspec) {
 
       else if (is_aoscram    (fptr, &status, obs, &obs_flag) || 
           	   is_gbtstatus  (fptr, &status, obs, &obs_flag) ||
-          	   is_faststatus (fptr, &status, obs, &obs_flag)) {
+          	   is_faststatus (fptr, &status, obs, &obs_flag) ||
+               is_mrostatus  (fptr, &status, obs, &obs_flag)) {
 		status = process_meta_data(	coarchid, 
 						  		   	clock_freq, 
 						  			obs, 
@@ -892,6 +907,26 @@ int is_faststatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
     if (!*obs_flag) 
     {
       strcpy(obs, "FAST");
+      *obs_flag = 1;
+    }
+    return 1;
+  }
+  if (*status == KEY_NO_EXIST) *status=0;
+  return 0; 
+}
+
+//------------------------------------------------------------------------------
+int is_mrostatus (fitsfile * fptr, int * status, char * obs, int * obs_flag)
+//------------------------------------------------------------------------------
+{
+
+  char extname[FLEN_VALUE];
+  fits_read_key(fptr, TSTRING, "EXTNAME", &extname, NULL, status);
+  if (strcmp(extname, "MROSTATUS") == 0)
+  {
+    if (!*obs_flag) 
+    {
+      strcpy(obs, "MRO");
       *obs_flag = 1;
     }
     return 1;
